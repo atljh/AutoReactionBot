@@ -1,4 +1,3 @@
-from aiogram import Bot
 from rich.console import Console
 
 console = Console()

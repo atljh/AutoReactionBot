@@ -31,7 +31,6 @@ async def get_account_info(phone: str):
     await client.connect()
 
     if not await client.is_user_authorized():
-        console.log(f"Аккаунт {phone} разлогинен")
         await client.disconnect()
         return None
 

@@ -3,7 +3,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 main_menu = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="➕ Добавить аккаунт", callback_data="add_account")],
         [InlineKeyboardButton(text="📜 Показать аккаунты", callback_data="view_accounts")],
-        [InlineKeyboardButton(text="❌ Удалить аккаунт", callback_data="delete_account")],
+        [InlineKeyboardButton(text="Настроить группы", callback_data="view_groups")],
         [InlineKeyboardButton(text="⚙️ Настроить реакции", callback_data="setup_reactions")],
         [InlineKeyboardButton(text="🔄 Перезагрузить софт", callback_data="restart_bot")]
     ]
@@ -37,8 +37,11 @@ cancel_button = InlineKeyboardMarkup(
     ]
 )
 
-delete = InlineKeyboardMarkup(
+add_group_button = InlineKeyboardMarkup(
     inline_keyboard=[
-        [InlineKeyboardButton(text="❌ Удалить", callback_data="delete_account")]
+        [
+            InlineKeyboardButton(text="Добавить группу", callback_data="add_group"),
+            InlineKeyboardButton(text="⬅️ Назад", callback_data="main_menu")
+        ]
     ]
 )

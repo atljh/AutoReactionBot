@@ -44,6 +44,13 @@ async def view_accounts(callback_query: types.CallbackQuery):
                 callback_data=f"delete_account_{phone}",
             )
         ])
+    keyboard.inline_keyboard.append([
+        InlineKeyboardButton(
+            text="⬅️ Назад",
+            callback_data="main_menu"
+        )
+    ])
+    
     message = "\n\n".join(accounts)
     await callback_query.message.answer(
         message, reply_markup=keyboard, parse_mode="HTML"

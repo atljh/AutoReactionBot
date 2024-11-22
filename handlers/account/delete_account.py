@@ -9,7 +9,6 @@ async def delete_account(callback_query: types.CallbackQuery):
     """
     phone = callback_query.data.split("_")[-1]
     session_path = os.path.join("sessions", f"{phone}.session")
-    print('delete', session_path)
     if os.path.exists(session_path):
         os.remove(session_path)
         await callback_query.answer(f"Аккаунт {phone} удалён.", show_alert=True)
