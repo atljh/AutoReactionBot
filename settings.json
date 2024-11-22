@@ -6,14 +6,14 @@
             "😂",
             "🔥"
         ],
-        "random_emojis": false,
+        "random_emojis": true,
         "ingore_messages": [
             1,
             3
         ],
         "work_intervals": {
-            "active_minutes": 10,
-            "pause_minutes": 20
+            "active_minutes": 103,
+            "pause_minutes": 3
         },
         "admin_bypass": true
     },

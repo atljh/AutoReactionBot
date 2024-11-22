@@ -10,7 +10,8 @@ main_menu = InlineKeyboardMarkup(inline_keyboard=[
 settings_menu = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Настройки групп", callback_data="view_groups")],
     [InlineKeyboardButton(text="Настройки реакций", callback_data="setup_reactions")],
-    [InlineKeyboardButton(text="Настроить время работы", callback_data="setap_work_time")],
+    [InlineKeyboardButton(text="Настроить время работы", callback_data="set_work_interval")],
+    [InlineKeyboardButton(text="Настроить пропуск сообщений", callback_data="setup_message_delay")],
     [InlineKeyboardButton(text="Обход админов: Включить/Выключить", callback_data="toggle_admin_bypass")],
     [InlineKeyboardButton(text="Рандомные эмодзи: Включить/Выключить", callback_data="toggle_random_emojis")],
     [InlineKeyboardButton(text="🔄 Перезагрузить софт", callback_data="restart_bot")],
