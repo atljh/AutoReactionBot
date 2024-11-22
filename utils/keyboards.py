@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-start_menu = InlineKeyboardMarkup(inline_keyboard=[
+main_menu = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="➕ Добавить аккаунт", callback_data="add_account")],
         [InlineKeyboardButton(text="📜 Показать аккаунты", callback_data="show_accounts")],
         [InlineKeyboardButton(text="❌ Удалить аккаунт", callback_data="delete_account")],
@@ -19,4 +19,10 @@ choose_emojis = InlineKeyboardMarkup(
 
 back_button = InlineKeyboardMarkup(
     inline_keyboard=[[InlineKeyboardButton(text="⬅️ Назад", callback_data="main_menu")]]
+)
+
+cancel_button = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [InlineKeyboardButton(text="❌ Отмена", callback_data="main_menu")]
+    ]
 )
