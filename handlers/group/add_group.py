@@ -1,26 +1,9 @@
-import os
-import re
-
 from aiogram import types
 from aiogram.fsm.context import FSMContext
+from states import AddGroupStates
 
 from utils import keyboards
-from states import AddGroupStates
-from handlers.group.view_group import view_groups_message
-
-GROUPS_FILE = 'groups.txt'
-
-
-def add_group(group_name):
-    if not os.path.exists(GROUPS_FILE):
-        open(GROUPS_FILE, 'w', encoding='utf-8').close()
-
-    with open(GROUPS_FILE, 'a', encoding='utf-8') as f:
-        f.write(group_name + "\n")
-
-def validate_group_link(group_link):
-    pattern = r"^t.me/[a-zA-Z0-9_]+$"
-    return re.match(pattern, group_link) is not None
+from utils.groups import validate_group_link, add_group
 
 async def save_group_name(message: types.Message,  state: FSMContext):
     group_names = message.text.strip().splitlines()
@@ -48,7 +31,6 @@ async def save_group_name(message: types.Message,  state: FSMContext):
             reply_markup=keyboards.main_menu,
             parse_mode="HTML"
         )
-    #await view_groups_message(message)
     await state.clear()
 
 async def add_group_handler(callback_query: types.CallbackQuery, state: FSMContext):

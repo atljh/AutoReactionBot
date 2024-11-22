@@ -9,11 +9,9 @@ API_ID = os.getenv("API_ID")
 API_HASH = os.getenv("API_HASH")
 SESSION_FOLDER = "sessions"
 
-
 def ensure_session_folder():
     if not os.path.exists(SESSION_FOLDER):
         os.makedirs(SESSION_FOLDER)
-
 
 async def create_telethon_session(phone: str):
     ensure_session_folder()
