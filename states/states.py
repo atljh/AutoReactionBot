@@ -10,3 +10,7 @@ class AddAccountStates(StatesGroup):
 class WorkIntervalStates(StatesGroup):
     waiting_for_active_minutes = State()
     waiting_for_pause_minutes = State()
+
+class IgnoreMessagesStates(StatesGroup):
+    waiting_for_min_messages = State()
+    waiting_for_max_messages = State()

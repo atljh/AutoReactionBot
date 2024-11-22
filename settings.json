@@ -8,8 +8,8 @@
         ],
         "random_emojis": true,
         "ingore_messages": [
-            1,
-            3
+            10,
+            20
         ],
         "work_intervals": {
             "active_minutes": 103,
