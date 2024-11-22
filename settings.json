@@ -6,7 +6,7 @@
             "😂",
             "🔥"
         ],
-        "random_emojis": true,
+        "random_emojis": false,
         "ingore_messages": [
             1,
             3
