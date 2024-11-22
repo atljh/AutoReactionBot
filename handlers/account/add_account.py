@@ -1,16 +1,11 @@
 import re
 
 from aiogram import types
-from aiogram import types
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup
 
 import utils.keyboards as keyboards
 from services.telethon_sessions import create_telethon_session
-
-class AddAccountStates(StatesGroup):
-    waiting_for_phone = State()
-
+from states import AddAccountStates
 
 async def add_account(callback_query: types.CallbackQuery, state: FSMContext):
     """

@@ -3,11 +3,18 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 main_menu = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="➕ Добавить аккаунт", callback_data="add_account")],
         [InlineKeyboardButton(text="📜 Показать аккаунты", callback_data="view_accounts")],
-        [InlineKeyboardButton(text="Настроить группы", callback_data="view_groups")],
-        [InlineKeyboardButton(text="⚙️ Настроить реакции", callback_data="setup_reactions")],
+        [InlineKeyboardButton(text="⚙️ Настройки", callback_data="settings")],
         [InlineKeyboardButton(text="🔄 Перезагрузить софт", callback_data="restart_bot")]
     ]
 )
+
+settings_menu = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text="Настройки групп", callback_data="view_groups")],
+    [InlineKeyboardButton(text="Настройки реакций", callback_data="setup_reactions")],
+    [InlineKeyboardButton(text="Настроить время работы", callback_data="settings_work_time")],
+    [InlineKeyboardButton(text="Включить/Выключить обход админов", callback_data="toggle_admin_bypass")],
+    [InlineKeyboardButton(text="🔄 Перезагрузить софт", callback_data="restart_bot")]
+])
 
 choose_emojis = InlineKeyboardMarkup(
     inline_keyboard=[
@@ -40,7 +47,7 @@ cancel_button = InlineKeyboardMarkup(
 add_group_button = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Добавить группу", callback_data="add_group"),
+            InlineKeyboardButton(text="➕ Добавить группу", callback_data="add_group"),
             InlineKeyboardButton(text="⬅️ Назад", callback_data="main_menu")
         ]
     ]
