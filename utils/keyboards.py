@@ -11,18 +11,34 @@ main_menu = InlineKeyboardMarkup(inline_keyboard=[
 
 choose_emojis = InlineKeyboardMarkup(
     inline_keyboard=[
-        [InlineKeyboardButton(text="😂", callback_data="emoji_😂"), InlineKeyboardButton(text="❤️", callback_data="emoji_❤️")],
-        [InlineKeyboardButton(text="👍", callback_data="emoji_👍"), InlineKeyboardButton(text="🔥", callback_data="emoji_🔥")],
-        [InlineKeyboardButton(text="✅ Завершить выбор", callback_data="emoji_done")]
+        [
+            InlineKeyboardButton(text="😂", callback_data="emoji_😂"),
+            InlineKeyboardButton(text="❤️", callback_data="emoji_❤️")
+        ],
+        [
+            InlineKeyboardButton(text="👍", callback_data="emoji_👍"),
+            InlineKeyboardButton(text="🔥", callback_data="emoji_🔥")
+        ],
+        [
+            InlineKeyboardButton(text="✅ Завершить выбор", callback_data="emoji_done")
+        ]
     ]
 )
 
 back_button = InlineKeyboardMarkup(
-    inline_keyboard=[[InlineKeyboardButton(text="⬅️ Назад", callback_data="main_menu")]]
+    inline_keyboard=[
+        [InlineKeyboardButton(text="⬅️ Назад", callback_data="main_menu")]
+    ]
 )
 
 cancel_button = InlineKeyboardMarkup(
     inline_keyboard=[
         [InlineKeyboardButton(text="❌ Отмена", callback_data="main_menu")]
+    ]
+)
+
+delete = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [InlineKeyboardButton(text="❌ Удалить", callback_data="delete_account")]
     ]
 )

@@ -1,14 +1,12 @@
 import os
 import asyncio
 from dotenv import load_dotenv
-from rich.console import Console
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from handlers import setup_handlers
 from services.logging import setup_logging
-
-console = Console()
+from utils.console import console
 
 load_dotenv()
 

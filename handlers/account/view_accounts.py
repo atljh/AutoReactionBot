@@ -1,6 +1,9 @@
 from aiogram import types
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
 from services.account_manager import list_sessions, get_account_info
 import utils.keyboards as keyboards
+
 
 async def view_accounts(callback_query: types.CallbackQuery):
     """
@@ -10,19 +13,38 @@ async def view_accounts(callback_query: types.CallbackQuery):
     sessions = list_sessions()
 
     if not sessions:
-        await callback_query.message.answer("Список аккаунтов пуст.", reply_markup=keyboards.main_menu)
+        await callback_query.message.answer(
+            "❌ <b>Список аккаунтов пуст.</b>",
+            reply_markup=keyboards.main_menu,
+            parse_mode="HTML"
+        )
         return
 
-    message = "Добавленные аккаунты:\n"
+    accounts = []
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[])
+
     for phone in sessions:
         account_info = await get_account_info(phone)
         if account_info:
-            message += (
-                f"\n📱 Номер: {account_info['phone']}\n"
-                f"👤 Имя: {account_info['first_name']} {account_info['last_name']}\n"
-                f"🔗 Юзернейм: @{account_info['username']}\n"
+            account_text = (
+                f"📱 <b>Номер:</b> {account_info['phone']}\n"
+                f"👤 <b>Имя:</b> {account_info['first_name']} {account_info['last_name']}\n"
+                f"🔗 <b>Юзернейм:</b> @{account_info['username'] or '—'}\n"
+                f"———————————————"
             )
+            accounts.append(account_text)
         else:
-            message += f"\n❌ Не удалось получить данные для номера {phone}."
-
-    await callback_query.message.answer(message, reply_markup=keyboards.main_menu)
+            accounts.append(
+                f"❌ <b>Не удалось получить данные для номера:</b> {phone}\n"
+                f"———————————————"
+            )
+        keyboard.inline_keyboard.append([
+            InlineKeyboardButton(
+                text=f"🗑 Удалить {phone}",
+                callback_data=f"delete_account_{phone}",
+            )
+        ])
+    message = "\n\n".join(accounts)
+    await callback_query.message.answer(
+        message, reply_markup=keyboard, parse_mode="HTML"
+    )
