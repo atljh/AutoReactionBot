@@ -34,4 +34,3 @@ async def create_telethon_session(phone: str):
     
     print(f"Сессия для номера {phone} успешно создана.")
     return client
-2

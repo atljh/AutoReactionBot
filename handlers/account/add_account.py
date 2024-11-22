@@ -1,6 +1,6 @@
 import re
 
-from aiogram import Dispatcher, types
+from aiogram import types
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -54,14 +54,3 @@ async def process_phone_number(message: types.Message, state: FSMContext):
         await state.clear()
 
 
-async def show_accounts(callback_query: types.CallbackQuery):
-    await callback_query.message.delete()
-    await callback_query.message.answer(
-        "Список аккаунтов:",
-        reply_markup=keyboards.back_button
-    )
-
-def register_account_handlers(dp: Dispatcher):
-    dp.callback_query.register(add_account, lambda c: c.data == "add_account")
-    dp.message.register(process_phone_number, AddAccountStates.waiting_for_phone)
-    dp.callback_query.register(show_accounts, lambda c: c.data == "show_accounts")
