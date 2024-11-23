@@ -1,9 +1,7 @@
-from aiogram import Dispatcher, types
-
-from services.emoji_service import process_emoji_selection
+from aiogram import Dispatcher
 
 from handlers.settings.settings import settings_handler
-from handlers.settings.emoji import setup_reactions, toggle_random_emojis_handler
+from handlers.settings.emoji import setup_reactions, process_emoji_selection, toggle_random_emojis_handler
 from handlers.settings.admin_bypass import toggle_admin_bypass_handler
 from handlers.settings.work_interval import set_work_interval_handler, set_active_minutes, set_pause_minutes
 from handlers.settings.ignore_messages import set_ignore_messages_handler, set_max_messages, set_min_messages

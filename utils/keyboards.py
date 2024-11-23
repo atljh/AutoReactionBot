@@ -8,31 +8,57 @@ main_menu = InlineKeyboardMarkup(inline_keyboard=[
 )
 
 settings_menu = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="Настройки групп", callback_data="view_groups")],
-    [InlineKeyboardButton(text="Настройки реакций", callback_data="setup_reactions")],
-    [InlineKeyboardButton(text="Настроить время работы", callback_data="set_work_interval")],
-    [InlineKeyboardButton(text="Настроить пропуск сообщений", callback_data="set_ignore_messages")],
-    [InlineKeyboardButton(text="Обход админов: Включить/Выключить", callback_data="toggle_admin_bypass")],
-    [InlineKeyboardButton(text="Рандомные эмодзи: Включить/Выключить", callback_data="toggle_random_emojis")],
-    [InlineKeyboardButton(text="🔄 Перезагрузить софт", callback_data="restart_bot")],
+    # Группа настройки групп
+    [
+        InlineKeyboardButton(text="📋 Настройки групп", callback_data="view_groups"),
+    ],
+    
+    # Группа настройки реакций
+    [
+        InlineKeyboardButton(text="🎭 Настройки реакций", callback_data="setup_reactions"),
+        InlineKeyboardButton(text="🕒 Время работы", callback_data="set_work_interval"),
+    ],
+    
+    # Пропуск сообщений
+    [
+        InlineKeyboardButton(text="⏭️ Пропуск сообщений", callback_data="set_ignore_messages"),
+    ],
+    
+    # Дополнительные настройки
+    [
+        InlineKeyboardButton(text="⚙️ Обход админов: Вкл/Выкл", callback_data="toggle_admin_bypass"),
+        InlineKeyboardButton(text="🎲 Рандомные эмодзи: Вкл/Выкл", callback_data="toggle_random_emojis"),
+    ],
+    
+    # Действия
+    [
+        InlineKeyboardButton(text="🔄 Перезагрузить софт", callback_data="restart_bot"),
+    ],
 ])
 
 choose_emojis = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton(text="😂", callback_data="emoji_😂"),
-            InlineKeyboardButton(text="❤️", callback_data="emoji_❤️")
-        ],
-        [
+            InlineKeyboardButton(text="❤️", callback_data="emoji_❤️"),
             InlineKeyboardButton(text="👍", callback_data="emoji_👍"),
-            InlineKeyboardButton(text="🔥", callback_data="emoji_🔥")
+            InlineKeyboardButton(text="🔥", callback_data="emoji_🔥"),
         ],
         [
-            InlineKeyboardButton(text="✅ Завершить выбор", callback_data="emoji_done")
+            InlineKeyboardButton(text="👏", callback_data="emoji_👏"),
+            InlineKeyboardButton(text="🎉", callback_data="emoji_🎉"),
+            InlineKeyboardButton(text="😢", callback_data="emoji_😢"),
+            InlineKeyboardButton(text="😡", callback_data="emoji_😡"),
         ],
         [
-            InlineKeyboardButton(text="⬅️ Назад", callback_data="settings")
-        ]
+            InlineKeyboardButton(text="✅ Завершить выбор", callback_data="emoji_done"),
+        ],
+        [
+            InlineKeyboardButton(text="❌ Удалить все эмодзи", callback_data="emoji_clear"),
+        ],
+        [
+            InlineKeyboardButton(text="⬅️ Назад", callback_data="settings"),
+        ],
     ]
 )
 

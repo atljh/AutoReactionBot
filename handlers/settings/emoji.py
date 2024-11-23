@@ -12,6 +12,33 @@ async def setup_reactions(callback_query: types.CallbackQuery):
         reply_markup=keyboards.choose_emojis
     )
 
+chosen_emojis = []
+
+async def process_emoji_selection(callback_query: types.CallbackQuery):
+    settings = load_settings()
+    chosen_emojis = settings["reactions"].get("emojis", [])
+
+    emoji = callback_query.data.split("_")[1]
+    if emoji == "done":
+        if not chosen_emojis:
+            await callback_query.message.answer("Вы не выбрали ни одного эмодзи.")
+        else:
+            await callback_query.message.answer(
+                f"Выбранные эмодзи сохранены: {', '.join(chosen_emojis)}"
+            )
+    elif emoji == "clear":
+        settings["reactions"]["emojis"] = []
+        save_settings(settings)
+        await callback_query.message.answer("Все эмодзи удалены.")
+    else:
+        if emoji not in chosen_emojis:
+            chosen_emojis.append(emoji)
+            settings["reactions"]["emojis"] = chosen_emojis
+            save_settings(settings)
+            await callback_query.answer(f"Вы добавили: {emoji}")
+        else:
+            await callback_query.answer(f"Эмодзи {emoji} уже выбрано.")
+
 
 async def toggle_random_emojis_handler(callback_query: CallbackQuery):
     await toggle_random_emojis(callback_query)
