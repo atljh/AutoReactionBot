@@ -12,6 +12,7 @@ async def setup_reactions(callback_query: types.CallbackQuery):
         reply_markup=keyboards.choose_emojis
     )
 
+
 async def toggle_random_emojis_handler(callback_query: CallbackQuery):
     await toggle_random_emojis(callback_query)
 

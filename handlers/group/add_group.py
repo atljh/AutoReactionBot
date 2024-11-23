@@ -4,6 +4,7 @@ from states import AddGroupStates
 
 from utils import keyboards
 from utils.groups import validate_group_link, add_group
+from .view_group import view_groups_message
 
 async def save_group_name(message: types.Message,  state: FSMContext):
     group_names = message.text.strip().splitlines()
@@ -22,15 +23,15 @@ async def save_group_name(message: types.Message,  state: FSMContext):
     if valid_groups:
         await message.answer(
             f"Группа <b>{', '.join(valid_groups)}</b> успешно добавлена!",
-            reply_markup=keyboards.main_menu,
             parse_mode="HTML"
         )
+        await view_groups_message(message)
     else:
         await message.answer(
             "Не было добавлено ни одной группы. Убедитесь, что ссылки имеют правильный формат.",
-            reply_markup=keyboards.main_menu,
             parse_mode="HTML"
         )
+        await view_groups_message(message)
     await state.clear()
 
 async def add_group_handler(callback_query: types.CallbackQuery, state: FSMContext):
