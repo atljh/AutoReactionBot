@@ -4,22 +4,21 @@ from states import AddGroupStates
 
 from utils import keyboards
 from utils.settings import load_settings, save_settings
+from utils.groups import add_group
 from .view_group import view_groups_message
 
 async def save_group_name(message: types.Message,  state: FSMContext):
     group_names = message.text.strip().splitlines()
     valid_groups = []
-    settings = load_settings()
 
     for group in group_names:
         group = group.strip()
         if group.startswith('https://'):
             group = group[8:]
+        add_group(group)
         valid_groups.append(group)
 
     if valid_groups:
-        settings['groups'] = valid_groups
-        save_settings(settings)
         await message.answer(
             f"Группа <b>{', '.join(valid_groups)}</b> успешно добавлена!",
             parse_mode="HTML"
