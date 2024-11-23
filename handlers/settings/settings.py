@@ -1,7 +1,6 @@
 from aiogram import types
 
 from utils import keyboards
-from utils.groups import list_groups
 from utils.settings import load_settings
 
 async def settings_handler(callback_query: types.CallbackQuery):
@@ -10,7 +9,7 @@ async def settings_handler(callback_query: types.CallbackQuery):
     reactions = settings["reactions"]
     formatted_settings = (
         "<b>Ваши настройки:</b>\n\n"
-        f"<b>Группы:</b> {len(list_groups())} групп\n\n"
+        f"<b>Группы:</b> {len(settings['groups'])} групп\n\n"
         f"<b>Эмодзи для реакций:</b> {', '.join(reactions['emojis'])}\n"
         f"<b>Рандомные эмодзи:</b> {'<i>Включено</i>' if reactions['random_emojis'] else '<i>Выключено</i>'}\n\n"
         f"<b>Обход администраторов:</b> {'<i>Включено</i>' if reactions['admin_bypass'] else '<i>Выключено</i>'}\n\n"
@@ -31,7 +30,7 @@ async def settings_message_handler(message: types.Message):
     reactions = settings["reactions"]
     formatted_settings = (
         "<b>Ваши настройки:</b>\n\n"
-        f"<b>Группы:</b> {len(list_groups())} групп\n\n"
+        f"<b>Группы:</b> {len(settings['groups'])} групп\n\n"
         f"<b>Эмодзи для реакций:</b> {', '.join(reactions['emojis'])}\n"
         f"<b>Рандомные эмодзи:</b> {'<i>Включено</i>' if reactions['random_emojis'] else '<i>Выключено</i>'}\n\n"
         f"<b>Обход администраторов:</b> {'<i>Включено</i>' if reactions['admin_bypass'] else '<i>Выключено</i>'}\n\n"

@@ -3,7 +3,6 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
-from utils.groups import list_groups
 from utils.settings import load_settings, save_settings
 from utils import keyboards
 from states import SetEmojiState
@@ -106,7 +105,7 @@ async def toggle_random_emojis(callback_query: types.CallbackQuery):
 
     formatted_settings = (
         "<b>Ваши настройки:</b>\n\n"
-        f"<b>Группы:</b> {len(list_groups())} групп\n\n"
+        f"<b>Группы:</b> {len(settings['groups'])} групп\n\n"
         f"<b>Эмодзи для реакций:</b> {', '.join(settings['reactions']['emojis'])}\n"
         f"<b>Рандомные эмодзи:</b> {status_text}\n\n"
         f"<b>Обход администраторов:</b> {'<i>Включёно</i>' if settings['reactions']['admin_bypass'] else '<i>Выключено</i>'}\n\n"

@@ -58,6 +58,13 @@ back_button = InlineKeyboardMarkup(
     ]
 )
 
+back_settings_button = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [InlineKeyboardButton(text="⬅️ Назад", callback_data="settings")]
+    ]
+)
+
+
 cancel_button = InlineKeyboardMarkup(
     inline_keyboard=[
         [InlineKeyboardButton(text="❌ Отмена", callback_data="main_menu")]
