@@ -1,22 +1,21 @@
-import asyncio
 import os
 import re
-from dotenv import load_dotenv
+import asyncio
+
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from telethon import TelegramClient, errors
+from dotenv import load_dotenv
+
 from states import AddAccountStates
+from utils.keyboards import cancel_button
 
 load_dotenv()
 API_ID = os.getenv("API_ID")
 API_HASH = os.getenv("API_HASH")
 SESSION_FOLDER = "sessions"
 os.makedirs(SESSION_FOLDER, exist_ok=True)
-
-cancel_button = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="❌ Отменить", callback_data="cancel")],
-])
 
 
 async def add_account(callback_query: types.CallbackQuery, state: FSMContext):
@@ -45,7 +44,7 @@ async def process_phone_number(message: types.Message, state: FSMContext):
 
         await state.update_data(phone=phone, client=client)
         await message.answer(
-            "Код подтверждения отправлен. Введите его.",
+            "Введите пришедший код уведомления добавив пробел после любой цифры\nНапример: 81 35",
             reply_markup=cancel_button,
         )
         await state.set_state(AddAccountStates.waiting_for_code)
@@ -59,7 +58,7 @@ async def process_auth_code(message: types.Message, state: FSMContext):
     """
     Handle the confirmation code for login.
     """
-    code = re.sub(r"\D", "", message.text.strip()) 
+    code = message.text.strip().replace(" ", '')
     data = await state.get_data()
     client: TelegramClient = data.get("client")
 

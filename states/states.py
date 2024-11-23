@@ -15,3 +15,9 @@ class WorkIntervalStates(StatesGroup):
 class IgnoreMessagesStates(StatesGroup):
     waiting_for_min_messages = State()
     waiting_for_max_messages = State()
+
+class SetLastMessages(StatesGroup):
+    waiting_for_messages_amount = State()
+
+class SetEmojiState(StatesGroup):
+    waiting_for_emoji = State()

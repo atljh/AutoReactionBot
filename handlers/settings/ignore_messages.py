@@ -1,7 +1,6 @@
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 from utils.settings import load_settings, save_settings
-from utils.keyboards import settings_menu
 from states import IgnoreMessagesStates
 
 from .settings import settings_message_handler

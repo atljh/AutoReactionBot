@@ -1,46 +1,94 @@
+import re
 from aiogram import types
+from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
-import utils.keyboards as keyboards
-from utils.settings import load_settings, save_settings
 from utils.groups import list_groups
-from .settings import settings_handler
+from utils.settings import load_settings, save_settings
+from utils import keyboards
+from states import SetEmojiState
 
-async def setup_reactions(callback_query: types.CallbackQuery):
+emoji_pattern = re.compile("[\U00010000-\U0010FFFF]", flags=re.UNICODE)
+
+async def set_emoji(callback_query: types.CallbackQuery, state: FSMContext):
+    """
+    Обработка кнопки для настройки эмодзи для реакции.
+    """
     await callback_query.message.delete()
-    await callback_query.message.answer(
-        "Выберите эмодзи для реакций:",
-        reply_markup=keyboards.choose_emojis
-    )
-
-chosen_emojis = []
-
-async def process_emoji_selection(callback_query: types.CallbackQuery):
     settings = load_settings()
-    chosen_emojis = settings["reactions"].get("emojis", [])
 
-    emoji = callback_query.data.split("_")[1]
-    if emoji == "done":
-        if not chosen_emojis:
-            await callback_query.message.answer("Вы не выбрали ни одного эмодзи.")
-        else:
-            await callback_query.message.answer(
-                f"Выбранные эмодзи сохранены: {', '.join(chosen_emojis)}"
-            )
-            await settings_handler(callback_query)
-    elif emoji == "clear":
-        settings["reactions"]["emojis"] = []
+    emojis_list = ", ".join(settings["reactions"]["emojis"]) if settings["reactions"]["emojis"] else "Нет добавленных эмодзи"
+
+    await callback_query.message.answer(
+        f"<b>Ваши текущие эмодзи для реакции:</b>\n{emojis_list}\n\n"
+        "<i>Введите эмодзи, который вы хотите добавить через пробел:</i>\n"
+        "<b>Примеры:</b> 😂, ❤️, 👍\n\n"
+        "Чтобы отменить, нажмите кнопку ниже.",
+        parse_mode="HTML",
+        reply_markup=keyboards.choose_emojis,
+    )
+    await state.set_state(SetEmojiState.waiting_for_emoji)
+
+async def set_emoji_message(message: types.Message, state: FSMContext):
+    await message.delete()
+    settings = load_settings()
+
+    emojis_list = ", ".join(settings["reactions"]["emojis"]) if settings["reactions"]["emojis"] else "Нет добавленных эмодзи"
+
+    await message.answer(
+        f"<b>Ваши текущие эмодзи для реакции:</b>\n{emojis_list}\n\n"
+        "<i>Введите эмодзи, который вы хотите добавить через пробел:</i>\n"
+        "<b>Примеры:</b> 😂, ❤️, 👍\n\n"
+        "Чтобы отменить, нажмите кнопку ниже.",
+        parse_mode="HTML",
+        reply_markup=keyboards.choose_emojis,
+    )
+    await state.set_state(SetEmojiState.waiting_for_emoji)
+
+async def clear_emojis(callback_query: types.CallbackQuery, state: FSMContext):
+    """
+    Обработка кнопки для очистки всех эмодзи из списка.
+    """
+    settings = load_settings()
+
+    settings["reactions"]["emojis"] = []  # Очистить список эмодзи
+    save_settings(settings)
+
+    await state.clear()
+    await set_emoji(callback_query, state)
+
+async def process_emoji_input(message: types.Message, state: FSMContext):
+    """
+    Обработка введенного пользователем эмодзи для добавления в настройки.
+    Проверка, что введенный текст является валидным эмодзи.
+    """
+    input_text = message.text.strip()
+
+    if not input_text:
+        await message.answer("Пожалуйста, введите хотя бы одно эмодзи.")
+        return
+
+    emojis = input_text.split()
+
+    valid_emojis = [emoji for emoji in emojis if emoji_pattern.match(emoji)]
+
+    if not valid_emojis:
+        await message.answer("Пожалуйста, введите хотя бы одно корректное эмодзи.")
+        return
+
+    settings = load_settings()
+
+    new_emojis = [emoji for emoji in valid_emojis if emoji not in settings["reactions"]["emojis"]]
+
+    if new_emojis:
+        settings["reactions"]["emojis"].extend(new_emojis)
         save_settings(settings)
-        await callback_query.message.answer("Все эмодзи удалены.")
-        await settings_handler(callback_query)
+        await message.answer(f"Эмодзи {', '.join(new_emojis)} успешно добавлены.")
     else:
-        if emoji not in chosen_emojis:
-            chosen_emojis.append(emoji)
-            settings["reactions"]["emojis"] = chosen_emojis
-            save_settings(settings)
-            await callback_query.answer(f"Вы добавили: {emoji}")
-        else:
-            await callback_query.answer(f"Эмодзи {emoji} уже выбрано.")
+        await message.answer("Все введенные эмодзи уже есть в списке.")
+
+    await state.clear()
+    await set_emoji_message(message, state)
 
 
 async def toggle_random_emojis_handler(callback_query: CallbackQuery):
