@@ -5,6 +5,7 @@ from handlers.settings.emoji import setup_reactions, process_emoji_selection, to
 from handlers.settings.admin_bypass import toggle_admin_bypass_handler
 from handlers.settings.work_interval import set_work_interval_handler, set_active_minutes, set_pause_minutes
 from handlers.settings.ignore_messages import set_ignore_messages_handler, set_max_messages, set_min_messages
+from handlers.settings.restart import restart_bot
 
 from states import WorkIntervalStates, IgnoreMessagesStates
 
@@ -22,3 +23,5 @@ def register_settings_handlers(dp: Dispatcher):
     dp.callback_query.register(set_ignore_messages_handler, lambda c: c.data == "set_ignore_messages")
     dp.message.register(set_min_messages, IgnoreMessagesStates.waiting_for_min_messages)
     dp.message.register(set_max_messages, IgnoreMessagesStates.waiting_for_max_messages)
+
+    dp.callback_query.register(restart_bot, lambda c: c.data == "restart_bot")

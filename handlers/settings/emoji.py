@@ -4,6 +4,7 @@ from aiogram.types import CallbackQuery
 import utils.keyboards as keyboards
 from utils.settings import load_settings, save_settings
 from utils.groups import list_groups
+from .settings import settings_handler
 
 async def setup_reactions(callback_query: types.CallbackQuery):
     await callback_query.message.delete()
@@ -26,10 +27,12 @@ async def process_emoji_selection(callback_query: types.CallbackQuery):
             await callback_query.message.answer(
                 f"Выбранные эмодзи сохранены: {', '.join(chosen_emojis)}"
             )
+            await settings_handler(callback_query)
     elif emoji == "clear":
         settings["reactions"]["emojis"] = []
         save_settings(settings)
         await callback_query.message.answer("Все эмодзи удалены.")
+        await settings_handler(callback_query)
     else:
         if emoji not in chosen_emojis:
             chosen_emojis.append(emoji)
