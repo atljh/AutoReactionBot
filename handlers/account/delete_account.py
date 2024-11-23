@@ -11,8 +11,8 @@ async def delete_account(callback_query: types.CallbackQuery):
     session_path = os.path.join("sessions", f"{phone}.session")
     if os.path.exists(session_path):
         os.remove(session_path)
-        await callback_query.answer(f"Аккаунт {phone} удалён.", show_alert=True)
+        await callback_query.answer(f"Аккаунт {phone} удалён.")
     else:
-        await callback_query.answer(f"Аккаунт {phone} не найден.", show_alert=True)
+        await callback_query.answer(f"Аккаунт {phone} не найден.")
 
     await view_accounts(callback_query)

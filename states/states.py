@@ -1,11 +1,12 @@
 from aiogram.fsm.state import State, StatesGroup
 
+class AddAccountStates(StatesGroup):
+    waiting_for_phone = State()
+    waiting_for_code = State()
+    waiting_for_password = State()
 
 class AddGroupStates(StatesGroup):
     waiting_for_group = State()
-
-class AddAccountStates(StatesGroup):
-    waiting_for_phone = State()
 
 class WorkIntervalStates(StatesGroup):
     waiting_for_active_minutes = State()
