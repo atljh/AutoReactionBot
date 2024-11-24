@@ -21,3 +21,6 @@ class SetLastMessages(StatesGroup):
 
 class SetEmojiState(StatesGroup):
     waiting_for_emoji = State()
+
+class SendDelay(StatesGroup):
+    waiting_for_delay = State()

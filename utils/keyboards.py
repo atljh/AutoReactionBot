@@ -34,6 +34,7 @@ settings_menu = InlineKeyboardMarkup(inline_keyboard=[
     
     # Действия
     [
+        InlineKeyboardButton(text="Задержка реакций", callback_data="send_delay"),
         InlineKeyboardButton(text="🔄 Перезагрузить софт", callback_data="restart_bot"),
     ],
     [

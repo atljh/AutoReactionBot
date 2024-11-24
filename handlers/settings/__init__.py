@@ -7,8 +7,9 @@ from handlers.settings.ignore_messages import set_ignore_messages_handler, set_m
 from handlers.settings.restart import restart_bot
 from handlers.settings.set_last_messages import set_last_messages, process_last_messages_count
 from handlers.settings.emoji import set_emoji, process_emoji_input, toggle_random_emojis_handler, clear_emojis
+from handlers.settings.message_delay import set_delay_messages, process_delay_messages_count
 
-from states import WorkIntervalStates, IgnoreMessagesStates, SetLastMessages, SetEmojiState
+from states import WorkIntervalStates, IgnoreMessagesStates, SetLastMessages, SetEmojiState, SendDelay
 
 
 def register_settings_handlers(dp: Dispatcher):
@@ -30,5 +31,8 @@ def register_settings_handlers(dp: Dispatcher):
     
     dp.callback_query.register(set_last_messages, lambda c: c.data == "set_last_messages")
     dp.message.register(process_last_messages_count, SetLastMessages.waiting_for_messages_amount)
+
+    dp.callback_query.register(set_delay_messages, lambda c: c.data == "send_delay")
+    dp.message.register(process_delay_messages_count, SendDelay.waiting_for_delay)
 
     dp.callback_query.register(restart_bot, lambda c: c.data == "restart_bot")

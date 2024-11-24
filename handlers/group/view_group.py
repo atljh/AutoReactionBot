@@ -5,15 +5,14 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from utils import keyboards 
 from utils.settings import load_settings, save_settings
-
+from utils.groups import list_groups
 
 async def view_groups(callback_query: types.CallbackQuery):
     """
     Просмотр списка добавленных групп.
     """
     await callback_query.message.delete()
-    settings = load_settings()
-    groups = settings['groups']
+    groups = list_groups()
     
     if not groups:
         await callback_query.message.answer("❌ Список групп пуст.", reply_markup=keyboards.add_group_button)
@@ -39,8 +38,7 @@ async def view_groups(callback_query: types.CallbackQuery):
 
 async def view_groups_message(message: types.Message):
     await message.delete()
-    settings = load_settings()
-    groups = settings['groups']
+    groups = list_groups()
 
     if not groups:
         await message.answer("❌ Список групп пуст.", reply_markup=keyboards.add_group_button)
