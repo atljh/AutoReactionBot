@@ -4,7 +4,8 @@ main_menu = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="➕ Добавить аккаунт", callback_data="add_account")],
     [InlineKeyboardButton(text="📜 Показать аккаунты", callback_data="view_accounts")],
     [InlineKeyboardButton(text="⚙️ Настройки", callback_data="settings")],
-    [InlineKeyboardButton(text="🚀 Запустить софт", callback_data="start_software")]
+    [InlineKeyboardButton(text="🚀 Запустить софт", callback_data="start_software")],
+    [InlineKeyboardButton(text="🛑 Остановить софт", callback_data="stop_software")],
 ])
 
 
