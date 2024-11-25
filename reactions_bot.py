@@ -1,31 +1,21 @@
 import os
 import asyncio
-import json
 from random import choice, randint
+
+from dotenv import load_dotenv
 from telethon import TelegramClient, events
 from telethon.tl.functions.messages import SendReactionRequest
-from telethon.errors.rpcerrorlist import ChatAdminRequiredError
+from telethon.errors.rpcerrorlist import ChatAdminRequiredError, UserNotParticipantError
+from telethon.tl.types import ReactionEmoji
+
+from utils.settings import load_settings, save_settings
+from utils.console import console
+
+load_dotenv()
 
 SESSION_FOLDER = "sessions"
 os.makedirs(SESSION_FOLDER, exist_ok=True)
 
-SETTINGS_FILE = "settings.json"
-
-async def load_settings():
-    """
-    Загрузка настроек из settings.json.
-    """
-    if not os.path.exists(SETTINGS_FILE):
-        print(f"Файл {SETTINGS_FILE} не найден.")
-        return None
-    
-    with open(SETTINGS_FILE, "r") as file:
-        try:
-            settings = json.load(file)
-            return settings
-        except json.JSONDecodeError:
-            print("Ошибка: неверный формат settings.json")
-            return None
 
 async def resolve_groups(client, groups):
     """
@@ -33,45 +23,112 @@ async def resolve_groups(client, groups):
     """
     resolved_ids = []
     for group in groups:
-        if isinstance(group, int):  # Если это уже ID
+        if isinstance(group, int):
             resolved_ids.append(group)
-        elif isinstance(group, str):  # Если это ссылка
+        elif isinstance(group, str):
             try:
                 entity = await client.get_entity(group)
                 resolved_ids.append(entity.id)
             except Exception as e:
-                print(f"Ошибка при обработке группы {group}: {e}")
+                console.log(f"Ошибка при обработке группы {group}: {e}")
     return resolved_ids
+
+
+async def react_to_last_messages(client, chat_id, settings, active):
+    """
+    Пройтись по последним сообщениям группы и добавить реакции.
+    """
+    if not active:
+        return
+
+    reactions = settings["reactions"]
+    emojis = reactions["emojis"]
+    random_emojis = reactions.get("random_emojis", True)
+    send_delay = reactions.get("send_delay", 10)
+    ignore_messages_range = reactions.get("ignore_messages", [1, 3])
+    last_messages_count = reactions.get("last_messages_count", 0)
+
+    try:
+        messages = await client.get_messages(chat_id, limit=last_messages_count)
+        console.log(f"Обрабатывается {len(messages)} сообщений в группе {chat_id}")
+
+        for i, message in enumerate(messages):
+            if i % randint(*ignore_messages_range) == 0:
+                console.log(f"Сообщение {message.id} проигнорировано.")
+                continue
+
+            reaction = choice(emojis) if random_emojis else emojis[0]
+            try:
+                await client(SendReactionRequest(
+                    peer=chat_id,
+                    msg_id=message.id,
+                    reaction=[ReactionEmoji(emoticon=reaction)]
+                ))
+                console.log(f"Реакция {reaction} добавлена к сообщению {message.id}.")
+            except ChatAdminRequiredError:
+                console.log(f"Недостаточно прав для реакции в группе {chat_id}.")
+                return
+            except Exception as e:
+                console.log(f"Ошибка при установке реакции: {e}")
+                if "Invalid reaction" in str(e):
+                    console.log(f"Удаляем некорректную реакцию: {reaction}")
+                    emojis.remove(reaction)
+                    save_settings(settings)
+                    if not emojis:
+                        console.log("Больше нет доступных эмодзи для отправки.")
+                        return
+
+            await asyncio.sleep(send_delay)
+
+    except Exception as e:
+        console.log(f"Ошибка при обработке сообщений группы {chat_id}: {e}")
+
 
 async def start_client(session_path, api_id, api_hash, settings):
     """
     Запуск клиента и настройка событий.
     """
-    print(f"Запуск сессии {session_path}...")
     client = TelegramClient(session_path, api_id, api_hash)
 
     await client.connect()
     if not (await client.is_user_authorized()):
-        print('Аккаунт разлогинен.')
+        console.log(f'Аккаунт {session_path[9:]} разлогинен.')
         await client.disconnect()
         return None
 
     groups = settings.get("groups", [])
     resolved_groups = await resolve_groups(client, groups)
-    print(resolved_groups)
     reactions = settings["reactions"]
     emojis = reactions["emojis"]
     random_emojis = reactions.get("random_emojis", True)
-    send_delay = reactions.get("send_delay", 200) / 1000
-    ignore_messages = set(reactions.get("ingore_messages", []))
-    last_messages_count = reactions.get("last_messages_count", 0)
+    send_delay = reactions.get("send_delay", 10)
     admin_bypass = reactions.get("admin_bypass", False)
+    ignore_messages_range = reactions.get("ignore_messages", [1, 3])
 
     work_intervals = reactions.get("work_intervals", {"active_minutes": 10, "pause_minutes": 20})
     active_time = work_intervals["active_minutes"] * 60
     pause_time = work_intervals["pause_minutes"] * 60
 
     active = True
+
+    async def work_cycle():
+        """
+        Циклическое управление активностью клиента.
+        """
+        nonlocal active
+        while True:
+            console.log(f"Активная фаза {active_time // 60} минут.")
+            active = True
+            await asyncio.sleep(active_time)
+
+            console.log(f"Пауза {pause_time // 60} минут.")
+            active = False
+            await asyncio.sleep(pause_time)
+
+    asyncio.create_task(work_cycle())
+
+    for group_id in resolved_groups:
+        await react_to_last_messages(client, group_id, settings, active)
 
     @client.on(events.NewMessage(chats=resolved_groups))
     async def handler(event):
@@ -81,77 +138,73 @@ async def start_client(session_path, api_id, api_hash, settings):
         if not event.is_group or not active:
             return
 
-        if event.id in ignore_messages:
-            print(f"Сообщение {event.id} проигнорировано (в списке исключений).")
+        if event.id % randint(*ignore_messages_range) == 0:
+            console.log(f"Сообщение {event.id} проигнорировано (в диапазоне ignore_messages).")
             return
 
-        if admin_bypass and (await event.get_sender()).participant.admin_rights:
-            print(f"Сообщение {event.id} проигнорировано (администратор).")
-            return
+        try:
+            sender = await event.get_sender()            
+            permissions = await client.get_permissions(event.chat_id, sender)
 
-        if last_messages_count > 0:
-            messages = await client.get_messages(event.chat_id, limit=last_messages_count)
-            if event.id not in [msg.id for msg in messages]:
-                print(f"Сообщение {event.id} проигнорировано (вне последних {last_messages_count} сообщений).")
+            if admin_bypass and permissions.is_admin:
+                console.log(f"Сообщение проигнорировано (администратор).")
                 return
+        except UserNotParticipantError:
+            console.log(f"Пользователь не является участником группы.")
+        except Exception as e:
+            console.log(f"Ошибка при получении участника: {e}")
+            return
 
         reaction = choice(emojis) if random_emojis else emojis[0]
         try:
             await client(SendReactionRequest(
                 peer=event.chat_id,
                 msg_id=event.id,
-                reaction=[reaction]
+                reaction=[ReactionEmoji(emoticon=reaction)]
             ))
-            print(f"Поставлена реакция {reaction} на сообщение {event.id} в группе {event.chat_id}")
+            console.log(f"Поставлена реакция {reaction} в группе {event.chat_id}")
         except ChatAdminRequiredError:
-            print(f"Недостаточно прав для реакции в группе {event.chat_id}")
+            console.log(f"Недостаточно прав для реакции в группе {event.chat_id}")
         except Exception as e:
-            print(f"Ошибка при установке реакции: {e}")
+            console.log(f"Ошибка при установке реакции: {e}")
+            if "Invalid reaction" in str(e):
+                console.log(f"Удаляем некорректную реакцию: {reaction}")
+                emojis.remove(reaction)
+                save_settings(settings)
+                if not emojis:
+                    console.log("Больше нет доступных эмодзи для отправки.")
+                    return
 
         await asyncio.sleep(send_delay)
 
-    async def work_cycle():
-        """
-        Циклическое управление активностью клиента.
-        """
-        nonlocal active
-        while True:
-            print(f"Активная фаза {active_time // 60} минут.")
-            active = True
-            await asyncio.sleep(active_time)
 
-            print(f"Пауза {pause_time // 60} минут.")
-            active = False
-            await asyncio.sleep(pause_time)
-
-    asyncio.create_task(work_cycle())
-
-    print(f"Сессия {session_path} запущена и подключена.")
+    console.log(f"Сессия {session_path[9:]} запущена.")
     return client
+
 
 async def main():
     """
     Основной цикл запуска сессий.
     """
     if not os.getenv("API_ID") or not os.getenv("API_HASH"):
-        print("API_ID и API_HASH должны быть указаны в переменных окружения.")
+        console.log("API_ID и API_HASH должны быть указаны в переменных окружения.")
         return
 
     api_id = int(os.getenv("API_ID"))
     api_hash = os.getenv("API_HASH")
-    settings = await load_settings()
+    settings = load_settings()
     if not settings:
-        print("Настройки не загружены.")
+        console.log("Настройки не загружены.")
         return
 
     session_files = [
-        os.path.join(SESSION_FOLDER, f) 
-        for f in os.listdir(SESSION_FOLDER) 
+        os.path.join(SESSION_FOLDER, f)
+        for f in os.listdir(SESSION_FOLDER)
         if f.endswith(".session")
     ]
 
     if not session_files:
-        print("Сессии не найдены в папке sessions.")
+        console.log("Сессии не найдены в папке sessions.")
         return
 
     clients = []
@@ -164,7 +217,7 @@ async def main():
     try:
         await asyncio.gather(*[client.run_until_disconnected() for client in clients])
     except KeyboardInterrupt:
-        print("Остановка всех сессий...")
+        console.log("Остановка всех сессий...")
         for client in clients:
             await client.disconnect()
 

@@ -1,13 +1,34 @@
 import json
 import os
 
+from .emojis import filter_valid_emojis
+
 SETTINGS_FILE = "settings.json"
 
 def load_settings():
     if not os.path.exists(SETTINGS_FILE):
-        create_default_settings()
-    with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+        print(f"Файл {SETTINGS_FILE} не найден.")
+        return None
+
+    with open(SETTINGS_FILE, "r") as file:
+        try:
+            settings = json.load(file)
+        except json.JSONDecodeError:
+            print("Ошибка: неверный формат settings.json")
+            return None
+
+    if "reactions" in settings and "emojis" in settings["reactions"]:
+        emojis = settings["reactions"]["emojis"]
+        valid_emojis = filter_valid_emojis(emojis)
+
+        if len(valid_emojis) < len(emojis):
+            print("Найдены невалидные эмодзи. Они будут удалены из настроек.")
+            settings["reactions"]["emojis"] = valid_emojis
+
+            with open(SETTINGS_FILE, "w") as file:
+                json.dump(settings, file, indent=4, ensure_ascii=False)
+
+    return settings
 
 def save_settings(settings):
     with open(SETTINGS_FILE, "w", encoding="utf-8") as f:
