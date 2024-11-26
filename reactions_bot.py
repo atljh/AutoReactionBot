@@ -102,8 +102,8 @@ async def start_client(session_path, api_id, api_hash, settings):
     emojis = reactions["emojis"]
     random_emojis = reactions.get("random_emojis", True)
     send_delay = reactions.get("send_delay", 10)
-    admin_bypass = reactions.get("admin_bypass", False)
     ignore_messages_range = reactions.get("ignore_messages", [1, 3])
+    last_messages_count = reactions.get('last_messages_count', 0)
 
     work_intervals = reactions.get("work_intervals", {"active_minutes": 10, "pause_minutes": 20})
     active_time = work_intervals["active_minutes"] * 60
@@ -127,9 +127,10 @@ async def start_client(session_path, api_id, api_hash, settings):
 
     asyncio.create_task(work_cycle())
 
-    for group_id in resolved_groups:
-        await react_to_last_messages(client, group_id, settings, active)
-
+    if last_messages_count > 0:
+        for group_id in resolved_groups:
+            await react_to_last_messages(client, group_id, settings, active)
+            
     @client.on(events.NewMessage(chats=resolved_groups))
     async def handler(event):
         """
@@ -141,6 +142,10 @@ async def start_client(session_path, api_id, api_hash, settings):
         if event.id % randint(*ignore_messages_range) == 0:
             console.log(f"Сообщение {event.id} проигнорировано (в диапазоне ignore_messages).")
             return
+        
+        settings = load_settings()
+        reactions = settings["reactions"]
+        admin_bypass = reactions.get("admin_bypass", False)
 
         try:
             sender = await event.get_sender()            
@@ -149,6 +154,7 @@ async def start_client(session_path, api_id, api_hash, settings):
             if admin_bypass and permissions.is_admin:
                 console.log(f"Сообщение проигнорировано (администратор).")
                 return
+            
         except UserNotParticipantError:
             console.log(f"Пользователь не является участником группы.")
         except Exception as e:
@@ -174,9 +180,7 @@ async def start_client(session_path, api_id, api_hash, settings):
                 if not emojis:
                     console.log("Больше нет доступных эмодзи для отправки.")
                     return
-
         await asyncio.sleep(send_delay)
-
 
     console.log(f"Сессия {session_path[9:]} запущена.")
     return client
