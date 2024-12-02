@@ -1,25 +1,23 @@
 import os
-import re
-import asyncio
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from telethon import TelegramClient, errors
-from dotenv import load_dotenv
 
 from states import AddAccountStates
 from utils.keyboards import cancel_button
+from utils.config import load_config
 
-load_dotenv()
-API_ID = os.getenv("API_ID")
-API_HASH = os.getenv("API_HASH")
+config = load_config()
+API_ID = config.get("api_id")
+API_HASH = config.get("api_hash")
+
+
 SESSION_FOLDER = "sessions"
 os.makedirs(SESSION_FOLDER, exist_ok=True)
 
 
 async def add_account(callback_query: types.CallbackQuery, state: FSMContext):
-
     await callback_query.message.delete()
     await callback_query.message.answer(
         "Отправьте номер телефона в формате +1234567890",
@@ -29,7 +27,6 @@ async def add_account(callback_query: types.CallbackQuery, state: FSMContext):
 
 
 async def process_phone_number(message: types.Message, state: FSMContext):
-
     phone = message.text.strip()
     if not phone.startswith("+"):
         await message.answer("Номер телефона должен начинаться с '+'. Попробуйте снова.")

@@ -2,7 +2,6 @@ import os
 import asyncio
 from random import choice, randint
 
-from dotenv import load_dotenv
 from telethon import TelegramClient, events
 from telethon.tl.functions.messages import SendReactionRequest
 from telethon.errors.rpcerrorlist import ChatAdminRequiredError, UserNotParticipantError
@@ -10,8 +9,9 @@ from telethon.tl.types import ReactionEmoji
 
 from utils.settings import load_settings, save_settings
 from utils.console import console
+from utils.config import load_config
 
-load_dotenv()
+config = load_config()
 
 SESSION_FOLDER = "sessions"
 os.makedirs(SESSION_FOLDER, exist_ok=True)

@@ -1,11 +1,10 @@
 import os
 from telethon import TelegramClient
-from utils.console import console
+from utils.config import load_config
 
 SESSION_FOLDER = "sessions"
 
-from dotenv import load_dotenv
-load_dotenv()
+config = load_config()
 
 def list_sessions():
     """
@@ -27,7 +26,9 @@ async def get_account_info(phone: str):
     if not os.path.exists(session_path):
         return None
 
-    client = TelegramClient(session_path, os.getenv("API_ID"), os.getenv("API_HASH"))
+    client = TelegramClient(
+        session_path, config.get("API_ID"), config.get("API_HASH")
+    )
     await client.connect()
 
     if not await client.is_user_authorized():
