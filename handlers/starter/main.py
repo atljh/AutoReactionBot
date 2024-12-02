@@ -1,4 +1,3 @@
-import os
 import subprocess
 from aiogram import types
 
@@ -14,7 +13,7 @@ async def handle_start_software(callback_query: types.CallbackQuery):
 
     if telethon_process is None:
         try:
-            telethon_process = subprocess.Popen(["python", "reactions_bot.py"])
+            telethon_process = subprocess.Popen(["python","-m", "userbot.main"])
             await callback_query.message.answer("Telethon-бот успешно запущен!")
         except Exception as e:
             await callback_query.message.answer(f"Ошибка при запуске d-бота: {e}")
