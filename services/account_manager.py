@@ -1,6 +1,7 @@
 import os
 from telethon import TelegramClient
 from utils.config import load_config
+from utils.console import console
 
 SESSION_FOLDER = "sessions"
 
@@ -27,10 +28,13 @@ async def get_account_info(phone: str):
         return None
 
     client = TelegramClient(
-        session_path, config.get("API_ID"), config.get("API_HASH")
+        session_path, config.get("api_id"), config.get("api_hash")
     )
-    await client.connect()
-
+    try:
+        await client.connect()
+    except Exception as e:
+        console.log(f"Error phone {phone}", e)
+        
     if not await client.is_user_authorized():
         await client.disconnect()
         return None

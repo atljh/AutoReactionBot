@@ -15,7 +15,7 @@ async def set_delay_messages(callback_query: types.CallbackQuery, state: FSMCont
     
     await callback_query.message.answer(
         "Введите время в секундах для задержки между реакциями.",
-        reply_markup=keyboards.cancel_button,
+        reply_markup=keyboards.back_settings_button,
     )
     await state.set_state(SendDelay.waiting_for_delay)
 

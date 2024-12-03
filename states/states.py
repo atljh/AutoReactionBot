@@ -24,3 +24,6 @@ class SetEmojiState(StatesGroup):
 
 class SendDelay(StatesGroup):
     waiting_for_delay = State()
+
+class AddAdminState(StatesGroup):
+    waiting_for_admin = State()

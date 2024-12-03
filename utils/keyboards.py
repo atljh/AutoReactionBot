@@ -24,7 +24,7 @@ settings_menu = InlineKeyboardMarkup(inline_keyboard=[
     # Пропуск сообщений
     [
         InlineKeyboardButton(text="⏭️ Пропуск сообщений", callback_data="set_ignore_messages"),
-        InlineKeyboardButton(text="Последних сообщений", callback_data="set_last_messages"),
+        InlineKeyboardButton(text="💯 Последних сообщений", callback_data="set_last_messages"),
     ],
     
     # Дополнительные настройки
@@ -35,8 +35,11 @@ settings_menu = InlineKeyboardMarkup(inline_keyboard=[
     
     # Действия
     [
-        InlineKeyboardButton(text="Задержка реакций", callback_data="send_delay"),
+        InlineKeyboardButton(text="💤 Задержка реакций", callback_data="send_delay"),
         InlineKeyboardButton(text="🔄 Перезагрузить софт", callback_data="restart_bot"),
+    ],
+    [
+        InlineKeyboardButton(text="Администраторы", callback_data="list_admin")
     ],
     [
         InlineKeyboardButton(text="⬅️ Назад", callback_data="main_menu")

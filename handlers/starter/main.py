@@ -1,7 +1,17 @@
 import subprocess
 from aiogram import types
+import psutil
 
 telethon_process = None
+
+def is_userbot_process_running():
+    for process in psutil.process_iter(['pid', 'name', 'cmdline']):
+        try:
+            if process.info['cmdline'] and "python" in process.info['name'] and "-m" in process.info['cmdline'] and "userbot.main" in process.info['cmdline']:
+                return True
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+    return False
 
 async def handle_start_software(callback_query: types.CallbackQuery):
     """

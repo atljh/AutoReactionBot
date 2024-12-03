@@ -190,12 +190,12 @@ async def main():
     """
     Основной цикл запуска сессий.
     """
-    if not os.getenv("API_ID") or not os.getenv("API_HASH"):
-        console.log("API_ID и API_HASH должны быть указаны в переменных окружения.")
+    if not config.get("api_hash") or not config.get("api_id"):
+        console.log("api_id и api_hash должны быть указаны в переменных окружения.")
         return
 
-    api_id = int(os.getenv("API_ID"))
-    api_hash = os.getenv("API_HASH")
+    api_id = int(config.get("api_id"))
+    api_hash = config.get("api_hash")
     settings = load_settings()
     if not settings:
         console.log("Настройки не загружены.")

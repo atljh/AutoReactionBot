@@ -8,8 +8,12 @@ from handlers.settings.restart import restart_bot
 from handlers.settings.set_last_messages import set_last_messages, process_last_messages_count
 from handlers.settings.emoji import set_emoji, process_emoji_input, toggle_random_emojis_handler, clear_emojis
 from handlers.settings.message_delay import set_delay_messages, process_delay_messages_count
+from handlers.settings.admin import list_admin, add_admin_handler, admin_input_handler, delete_admin_handler
 
-from states import WorkIntervalStates, IgnoreMessagesStates, SetLastMessages, SetEmojiState, SendDelay
+from states import (
+    WorkIntervalStates, IgnoreMessagesStates, SetLastMessages,
+    SetEmojiState, SendDelay, AddAdminState
+)
 
 
 def register_settings_handlers(dp: Dispatcher):
@@ -34,5 +38,10 @@ def register_settings_handlers(dp: Dispatcher):
 
     dp.callback_query.register(set_delay_messages, lambda c: c.data == "send_delay")
     dp.message.register(process_delay_messages_count, SendDelay.waiting_for_delay)
+
+    dp.callback_query.register(list_admin, lambda c: c.data == "list_admin")
+    dp.callback_query.register(add_admin_handler, lambda c: c.data == "add_admin")
+    dp.callback_query.register(delete_admin_handler, lambda c: c.data.startswith("delete_admin_"))
+    dp.message.register(admin_input_handler, AddAdminState.waiting_for_admin)
 
     dp.callback_query.register(restart_bot, lambda c: c.data == "restart_bot")
