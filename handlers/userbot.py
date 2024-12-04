@@ -1,6 +1,9 @@
-import subprocess
-from aiogram import types
 import psutil
+import subprocess
+
+from aiogram import Router, F, types
+
+router = Router()
 
 telethon_process = None
 
@@ -13,6 +16,7 @@ def is_userbot_process_running():
             pass
     return False
 
+@router.callback_query(F.data == 'start_software')
 async def handle_start_software(callback_query: types.CallbackQuery):
     """
     Обработка нажатия кнопки 'Запустить софт'
@@ -30,6 +34,7 @@ async def handle_start_software(callback_query: types.CallbackQuery):
     else:
         await callback_query.message.answer("Telethon-бот уже работает.")
 
+@router.callback_query(F.data == 'stop_software')
 async def handle_stop_software(callback_query: types.CallbackQuery):
     """
     Обработка нажатия кнопки 'Остановить софт'

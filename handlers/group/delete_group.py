@@ -1,6 +1,6 @@
 from aiogram import types
 
-from handlers.group.view_group import view_groups
+from handlers.group.view_group import view_groups_handler
 from utils.groups import delete_group
 
 async def delete_group_handler(callback_query: types.CallbackQuery):
@@ -12,4 +12,4 @@ async def delete_group_handler(callback_query: types.CallbackQuery):
     else:
         await callback_query.answer(f"Группа {group_name} не найдена.")
 
-    await view_groups(callback_query)
+    await view_groups_handler(callback_query)

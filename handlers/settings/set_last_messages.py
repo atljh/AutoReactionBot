@@ -4,21 +4,18 @@ from aiogram.fsm.context import FSMContext
 from utils.settings import load_settings, save_settings
 from utils import keyboards
 from states import SetLastMessages
-
 from .settings import settings_message_handler
 
 async def set_last_messages(callback_query: types.CallbackQuery, state: FSMContext):
     """
     Обработка кнопки для настройки последнего количества сообщений для реакции.
     """
-    await callback_query.message.delete()
     
-    await callback_query.message.answer(
+    await callback_query.message.edit_text(
         "Введите количество последних сообщений, на которые бот должен реагировать (например, 5).",
         reply_markup=keyboards.cancel_button,
     )
     await state.set_state(SetLastMessages.waiting_for_messages_amount)
-
 
 async def process_last_messages_count(message: types.Message, state: FSMContext):
     """

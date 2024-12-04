@@ -5,12 +5,9 @@ from states import WorkIntervalStates
 from utils.settings import load_settings, save_settings
 from .settings import settings_message_handler
 
-
 async def set_work_interval_handler(callback_query: types.CallbackQuery, state: FSMContext):
-    await callback_query.message.delete()
-    await callback_query.message.answer(
+    await callback_query.message.edit_text(
         "Введите время работы в минутах (например, 10):",
-        reply_markup=types.ReplyKeyboardRemove(),
     )
     await state.set_state(WorkIntervalStates.waiting_for_active_minutes)
 

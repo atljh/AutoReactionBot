@@ -5,12 +5,11 @@ import utils.keyboards as keyboards
 from utils.config import load_config
 
 async def list_admin(callback_query: types.CallbackQuery):
-    await callback_query.message.delete()
     config = load_config()
     admins = config.get('admins')
 
     if not admins:
-        await callback_query.message.answer(
+        await callback_query.message.edit_text(
             "❌ <b>Список аккаунтов пуст.</b>",
             reply_markup=keyboards.main_menu,
             parse_mode="HTML"
@@ -45,18 +44,17 @@ async def list_admin(callback_query: types.CallbackQuery):
         )
     ])
     message = "\n".join(admins_list)
-    await callback_query.message.answer(
+    await callback_query.message.edit_text(
         message, reply_markup=keyboard, parse_mode="HTML"
     )
 
 
 async def list_admin_message(message: types.Message):
-    await message.delete()
     config = load_config()
     admins = config.get('admins')
 
     if not admins:
-        await message.answer(
+        await message.edit_text(
             "❌ <b>Список аккаунтов пуст.</b>",
             reply_markup=keyboards.main_menu,
             parse_mode="HTML"

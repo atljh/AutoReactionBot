@@ -1,11 +1,10 @@
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from states import AddGroupStates
 
 from utils import keyboards
-from utils.settings import load_settings, save_settings
 from utils.groups import add_group
 from .view_group import view_groups_message
+from states import AddGroupStates
 
 async def save_group_name(message: types.Message,  state: FSMContext):
     group_names = message.text.strip().splitlines()
@@ -31,10 +30,9 @@ async def save_group_name(message: types.Message,  state: FSMContext):
         )
         await view_groups_message(message)
     await state.clear()
-
+    
 async def add_group_handler(callback_query: types.CallbackQuery, state: FSMContext):
-    await callback_query.message.delete()
-    await callback_query.message.answer(
+    await callback_query.message.edit_text(
         "Введите ссылки на группы или id закрытого канала в формате\n<b>t.me/group1</b>\n<b>t.me/group2</b>\nКаждую ссылку на новой строке или через пробел.",
         reply_markup=keyboards.back_settings_button,
         parse_mode="HTML"

@@ -1,16 +1,13 @@
 from aiogram import types
 from aiogram.fsm.context import FSMContext
+
 from utils.settings import load_settings, save_settings
 from states import IgnoreMessagesStates
-
 from .settings import settings_message_handler
 
-
 async def set_ignore_messages_handler(callback_query: types.CallbackQuery, state: FSMContext):
-    await callback_query.message.delete()
-    await callback_query.message.answer(
+    await callback_query.message.edit_text(
         "Введите минимальное количество сообщений для пропуска (например, 1):",
-        reply_markup=types.ReplyKeyboardRemove(),
     )
     await state.set_state(IgnoreMessagesStates.waiting_for_min_messages)
 

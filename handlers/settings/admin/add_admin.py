@@ -8,8 +8,7 @@ from .list_admin import list_admin_message
 from utils.admin import add_admin_to_config
 
 async def add_admin_handler(callback_query: types.CallbackQuery, state: FSMContext):
-    await callback_query.message.delete()
-    await callback_query.message.answer(
+    await callback_query.message.edit_text(
         "Отправьте id админа или его юзернейм",
         reply_markup=back_settings_button,
     )

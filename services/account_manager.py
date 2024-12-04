@@ -34,6 +34,7 @@ async def get_account_info(phone: str):
         await client.connect()
     except Exception as e:
         console.log(f"Error phone {phone}", e)
+        return None
         
     if not await client.is_user_authorized():
         await client.disconnect()

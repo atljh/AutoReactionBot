@@ -1,14 +1,16 @@
-from .start import register_start_handlers
-from .account import register_account_handlers
-from .main_menu import register_main_menu_handlers
-from .group import register_group_handlers
-from .settings import register_settings_handlers
-from .starter import register_starter_handlers
+from aiogram import Router
 
-def setup_handlers(dp):
-    register_start_handlers(dp)
-    register_account_handlers(dp)
-    register_main_menu_handlers(dp)
-    register_group_handlers(dp)
-    register_settings_handlers(dp)
-    register_starter_handlers(dp)
+from .main_menu import router as start_router
+from .account import router as account_router
+from .group import router as group_router
+from .settings import router as settings_router
+from .userbot import router as userbot_router
+
+router = Router(name=__name__)
+router.include_router(start_router)
+router.include_router(account_router)
+router.include_router(group_router)
+router.include_router(settings_router)
+router.include_router(userbot_router)
+
+__all__ = ("router",)

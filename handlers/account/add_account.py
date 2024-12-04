@@ -18,9 +18,8 @@ SESSION_FOLDER = "sessions"
 os.makedirs(SESSION_FOLDER, exist_ok=True)
 
 
-async def add_account(callback_query: types.CallbackQuery, state: FSMContext):
-    await callback_query.message.delete()
-    await callback_query.message.answer(
+async def add_account_handler(callback_query: types.CallbackQuery, state: FSMContext):
+    await callback_query.message.edit_text(
         "Отправьте номер телефона в формате +1234567890",
         reply_markup=cancel_button,
     )
@@ -30,7 +29,7 @@ async def add_account(callback_query: types.CallbackQuery, state: FSMContext):
 async def process_phone_number(message: types.Message, state: FSMContext):
     phone = message.text.strip()
     if not phone.startswith("+"):
-        await message.answer("Номер телефона должен начинаться с '+'. Попробуйте снова.")
+        await message.edit_text("Номер телефона должен начинаться с '+'. Попробуйте снова.")
         return
 
     try:
@@ -41,14 +40,14 @@ async def process_phone_number(message: types.Message, state: FSMContext):
         result = await client.send_code_request(phone)
 
         await state.update_data(phone=phone, client=client)
-        await message.answer(
+        await message.edit_text(
             "Введите пришедший код уведомления добавив пробел после любой цифры\nНапример: 81 35",
             reply_markup=cancel_button,
         )
         await state.set_state(AddAccountStates.waiting_for_code)
 
     except Exception as e:
-        await message.answer(f"Произошла ошибка: {str(e)}", reply_markup=cancel_button)
+        await message.edit_text(f"Произошла ошибка: {str(e)}", reply_markup=cancel_button)
         await state.clear()
 
 

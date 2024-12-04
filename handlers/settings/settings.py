@@ -1,8 +1,8 @@
-from aiogram import types
+from aiogram import types, F
 
 from utils import keyboards
 from utils.settings import load_settings
-from handlers.starter.main import is_userbot_process_running
+from handlers.userbot import is_userbot_process_running
 
 
 async def settings_handler(callback_query: types.CallbackQuery):
@@ -26,8 +26,11 @@ async def settings_handler(callback_query: types.CallbackQuery):
         "<b>Вы можете обновить эти настройки в любой момент через меню!</b>\n"
     )
 
-    await callback_query.message.delete()
-    await callback_query.message.answer(formatted_settings, reply_markup=keyboards.settings_menu, parse_mode="HTML")
+    await callback_query.message.edit_text(
+        formatted_settings,
+        reply_markup=keyboards.settings_menu,
+        parse_mode="HTML"
+    )
 
 
 async def settings_message_handler(message: types.Message):
@@ -51,5 +54,8 @@ async def settings_message_handler(message: types.Message):
         "<b>Вы можете обновить эти настройки в любой момент через меню!</b>\n"
     )
 
-    await message.delete()
-    await message.answer(formatted_settings, reply_markup=keyboards.settings_menu, parse_mode="HTML")
+    await message.answer(
+        formatted_settings,
+        reply_markup=keyboards.settings_menu,
+        parse_mode="HTML"
+    )

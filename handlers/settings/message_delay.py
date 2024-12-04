@@ -4,21 +4,18 @@ from aiogram.fsm.context import FSMContext
 from utils.settings import load_settings, save_settings
 from utils import keyboards
 from states import SendDelay
-
 from .settings import settings_message_handler
 
 async def set_delay_messages(callback_query: types.CallbackQuery, state: FSMContext):
     """
     Обработка кнопки для настройки задержки между реакциями.
     """
-    await callback_query.message.delete()
     
-    await callback_query.message.answer(
+    await callback_query.message.edit_text(
         "Введите время в секундах для задержки между реакциями.",
         reply_markup=keyboards.back_settings_button,
     )
     await state.set_state(SendDelay.waiting_for_delay)
-
 
 async def process_delay_messages_count(message: types.Message, state: FSMContext):
     """
