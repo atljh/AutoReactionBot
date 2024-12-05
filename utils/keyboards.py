@@ -39,7 +39,9 @@ settings_menu = InlineKeyboardMarkup(inline_keyboard=[
         InlineKeyboardButton(text="🔄 Перезагрузить софт", callback_data="restart_bot"),
     ],
     [
-        InlineKeyboardButton(text="Администраторы", callback_data="list_admin")
+        InlineKeyboardButton(text="Администраторы", callback_data="list_admin"),
+        InlineKeyboardButton(text="Прокси", callback_data="view_proxy")
+
     ],
     [
         InlineKeyboardButton(text="⬅️ Назад", callback_data="main_menu")

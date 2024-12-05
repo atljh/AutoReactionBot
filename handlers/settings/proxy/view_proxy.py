@@ -2,47 +2,53 @@ from aiogram import types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 import utils.keyboards as keyboards
-from utils.config import load_config
+from utils.settings import load_settings
 
-async def list_admin(callback_query: types.CallbackQuery):
-    config = load_config()
-    admins = config.get('admins')
+async def view_proxy_handler(callback_query: types.CallbackQuery):
+    settings = load_settings()
+    proxies = settings.get('proxy')
 
-    if not admins:
+    if not proxies:
         keyboard = InlineKeyboardMarkup(inline_keyboard=[])
+        
         keyboard.inline_keyboard.append([
             InlineKeyboardButton(
-                text=f"➕ Добавить админа",
-                callback_data=f"add_admin",
+                text=f"➕ Добавить прокси",
+                callback_data=f"add_proxy",
             )
         ])
-        keyboard.inline_keyboard.append()
+        keyboard.inline_keyboard.append([
+            InlineKeyboardButton(
+                text="⬅️ Назад",
+                callback_data="settings"
+            )
+        ])
         await callback_query.message.edit_text(
-            "❌ <b>Список аккаунтов пуст.</b>",
+            "❌ <b>Список прокси пуст.</b>",
             reply_markup=keyboard,
             parse_mode="HTML"
         )
         return
     
-    admins_list = []
+    proxy_list = []
     keyboard = InlineKeyboardMarkup(inline_keyboard=[])
     keyboard.inline_keyboard.append([
         InlineKeyboardButton(
-            text=f"➕ Добавить админа",
-            callback_data=f"add_admin",
+            text=f"➕ Добавить прокси",
+            callback_data=f"add_proxy",
         )
     ])
-    for admin in admins:
-        account_text = (
-            f"👤 <b>{admin}</b>\n"
+    for proxy in proxies:
+        proxy_text = (
+            f"👤 <b>{proxy}</b>\n"
             f"———————————————"
         )
-        admins_list.append(account_text)
+        proxy_list.append(proxy_text)
         
         keyboard.inline_keyboard.append([
             InlineKeyboardButton(
-                text=f"🗑 Удалить {admin}",
-                callback_data=f"delete_admin_{admin}",
+                text=f"🗑 Удалить {proxy}",
+                callback_data=f"delete_proxy_{proxy}",
             )
         ])
     keyboard.inline_keyboard.append([
@@ -51,43 +57,43 @@ async def list_admin(callback_query: types.CallbackQuery):
             callback_data="settings"
         )
     ])
-    message = "\n".join(admins_list)
+    message = "\n".join(proxy_list)
     await callback_query.message.edit_text(
         message, reply_markup=keyboard, parse_mode="HTML"
     )
 
 
-async def list_admin_message(message: types.Message):
-    config = load_config()
-    admins = config.get('admins')
+async def view_proxy_handler_message(message: types.Message):
+    settings = load_settings()
+    proxies = settings.get('proxy')
 
-    if not admins:
+    if not proxies:
         await message.edit_text(
-            "❌ <b>Список аккаунтов пуст.</b>",
+            "❌ <b>Список прокси пуст.</b>",
             reply_markup=keyboards.main_menu,
             parse_mode="HTML"
         )
         return
     
-    admins_list = []
+    proxy_list = []
     keyboard = InlineKeyboardMarkup(inline_keyboard=[])
     keyboard.inline_keyboard.append([
         InlineKeyboardButton(
-            text=f"➕ Добавить админа",
-            callback_data=f"add_admin",
+            text=f"➕ Добавить прокси",
+            callback_data=f"add_proxy",
         )
     ])
-    for admin in admins:
-        account_text = (
-            f"👤 <b>{admin}</b>\n"
+    for proxy in proxies:
+        proxy_text = (
+            f"👤 <b>{proxy}</b>\n"
             f"———————————————"
         )
-        admins_list.append(account_text)
+        proxy_list.append(proxy_text)
         
         keyboard.inline_keyboard.append([
             InlineKeyboardButton(
-                text=f"🗑 Удалить {admin}",
-                callback_data=f"delete_admin_{admin}",
+                text=f"🗑 Удалить {proxy}",
+                callback_data=f"delete_proxy_{proxy}",
             )
         ])
     keyboard.inline_keyboard.append([
@@ -96,7 +102,7 @@ async def list_admin_message(message: types.Message):
             callback_data="main_menu"
         )
     ])
-    message_text = "\n".join(admins_list)
+    message_text = "\n".join(proxy_list)
     await message.answer(
         message_text, reply_markup=keyboard, parse_mode="HTML"
     )

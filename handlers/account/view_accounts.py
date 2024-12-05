@@ -55,7 +55,7 @@ async def view_accounts(callback_query: types.CallbackQuery, page: int = 1):
         return
 
     # Настройки пагинации
-    items_per_page = 2
+    items_per_page = 5
     total_sessions = len(sessions)
     total_pages = (total_sessions + items_per_page - 1) // items_per_page
     start_index = (page - 1) * items_per_page

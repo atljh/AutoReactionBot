@@ -27,3 +27,6 @@ class SendDelay(StatesGroup):
 
 class AddAdminState(StatesGroup):
     waiting_for_admin = State()
+
+class AddProxyState(StatesGroup):
+    waiting_for_proxy = State()

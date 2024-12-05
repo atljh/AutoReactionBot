@@ -42,22 +42,6 @@ async def view_groups_handler(callback_query: types.CallbackQuery):
         parse_mode="HTML"
     )
 
-async def link_account_handler(callback_query: types.CallbackQuery, group_name: str):
-    await callback_query.answer("Выберите аккаунт для привязки к группе.")
-    accounts = get_all_accounts()  # Fetch all accounts
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[])
-    for account in accounts:
-        keyboard.inline_keyboard.append([
-            InlineKeyboardButton(
-                text=f"Привязать к {account.phone}",
-                callback_data=f"confirm_link_{account.id}_{group_name}"
-            )
-        ])
-    await callback_query.message.edit_text(
-        "Выберите аккаунт для привязки:",
-        reply_markup=keyboard,
-    )
-
 async def view_groups_message(message: types.Message):
     groups = list_groups()
 
