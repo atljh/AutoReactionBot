@@ -1,5 +1,6 @@
+from copy import deepcopy
 from aiogram import types
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardButton
 
 import utils.keyboards as keyboards
 from utils.settings import load_settings
@@ -17,14 +18,13 @@ async def view_proxy_handler(callback_query: types.CallbackQuery):
         return
     
     proxy_list = []
-    keyboard = keyboards.proxy_button
+    keyboard = deepcopy(keyboards.proxy_button)
     for proxy in proxies:
         proxy_text = (
             f"👤 <b>{proxy}</b>\n"
             f"———————————————"
         )
         proxy_list.append(proxy_text)
-        
         keyboard.inline_keyboard.append([
             InlineKeyboardButton(
                 text=f"🗑 Удалить {proxy}",
@@ -50,22 +50,21 @@ async def view_proxy_handler_message(message: types.Message):
         return
     
     proxy_list = []
-    keyboard = keyboards.proxy_button
+    keyboard = deepcopy(keyboards.proxy_button)
     for proxy in proxies:
         proxy_text = (
             f"👤 <b>{proxy}</b>\n"
             f"———————————————"
         )
         proxy_list.append(proxy_text)
-        
         keyboard.inline_keyboard.append([
             InlineKeyboardButton(
                 text=f"🗑 Удалить {proxy}",
                 callback_data=f"delete_proxy_{proxy}",
             )
         ])
-    message = "\n".join(proxy_list)
-    await message.edit_text(
-        message, reply_markup=keyboard, parse_mode="HTML"
+    message_text = "\n".join(proxy_list)
+    await message.answer(
+        message_text, reply_markup=keyboard, parse_mode="HTML"
     )
 

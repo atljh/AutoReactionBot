@@ -50,21 +50,38 @@ choose_emojis = InlineKeyboardMarkup(
 )
 
 proxy_button = InlineKeyboardMarkup(
-        inline_keyboard=[
-        [InlineKeyboardButton(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(
                 text=f"➕ Добавить прокси",
                 callback_data=f"add_proxy",
-            ) 
+            )
         ],
         [
-        InlineKeyboardButton(
+            InlineKeyboardButton(
                 text="⬅️ Назад",
                 callback_data="settings"
             )
         ]
     ]
 )
-        
+
+admin_button = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text=f"➕ Добавить админа",
+                callback_data=f"add_admin",
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                text="⬅️ Назад",
+                callback_data="settings"
+            )
+        ]
+    ]
+)
 
 
 
