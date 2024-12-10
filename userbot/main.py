@@ -9,7 +9,7 @@ from telethon.tl.types import ReactionEmoji
 
 from utils.settings import load_settings, save_settings
 from utils.proxy import get_proxy, delete_proxy
-from utils.groups import get_active_group, list_groups, get_account_groups
+from utils.groups import get_active_groups, get_account_groups, get_active_group_accounts
 
 from utils.console import console
 from utils.config import load_config
@@ -87,7 +87,7 @@ async def react_to_last_messages(client, chat_id, settings, active):
         console.log(f"Ошибка при обработке сообщений группы {chat_id}: {e}")
 
 
-async def start_client(session_path, api_id, api_hash, settings):
+async def start_client(session_path, api_id, api_hash, groups):
     """
     Запуск клиента и настройка событий.
     """
@@ -107,16 +107,10 @@ async def start_client(session_path, api_id, api_hash, settings):
         console.log(f'Аккаунт {session_path[9:]} разлогинен.')
         await client.disconnect()
         return None
-    account_phone = session_path[9:].split('.')[0]
-    account_groups = get_account_groups(account_phone)
-    print(account_groups)
-    active_group = get_active_group()
-    if active_group:
-        resolved_groups = await resolve_groups(client, [active_group])
-    else:
-        groups = list_groups()
-        resolved_groups = await resolve_groups(client, groups)
 
+    resolved_groups = await resolve_groups(client, groups)
+
+    settings = load_settings()
     reactions = settings["reactions"]
     emojis = reactions["emojis"]
     random_emojis = reactions.get("random_emojis", True)
@@ -230,9 +224,20 @@ async def main():
         console.log("Сессии не найдены в папке sessions.")
         return
 
+    active_groups = get_active_groups()
+    for act_gr in active_groups:
+        active_accounts = get_active_group_accounts(act_gr)
+        print(active_accounts)
     clients = []
     for session_file in session_files:
-        client = await start_client(session_file, api_id, api_hash, settings)
+        account_phone = session_file[9:].split('.')[0]
+        account_groups = get_account_groups(account_phone)
+        active_groups = get_active_groups()
+        work_groups = []
+        for gr in account_groups:
+            if gr in active_groups:
+                work_groups.append(gr)
+        client = await start_client(session_file, api_id, api_hash, work_groups)
         if not client:
             continue
         clients.append(client)

@@ -12,13 +12,16 @@ def add_group(group_name: str) -> bool:
         return True
     return False 
 
-def delete_group(group_identifier: str) -> bool:
+def delete_group(group: str) -> bool:
     settings = load_settings()
     groups = settings.get("groups", {})
-    
-    if group_identifier in groups:
-        del groups[group_identifier]
+    active_groups = settings.get("active_groups", [])
+
+    if group in groups:
+        del groups[group]
         settings["groups"] = groups
+        if group in active_groups:
+            active_groups.remove(group)
         save_settings(settings)
         return True
     return False 
@@ -83,10 +86,31 @@ def is_group_active(group):
         return True
     return False
 
-def get_active_group():
+def get_active_groups():
     settings = load_settings()
     active_groups = settings.get("active_groups", [])
     return active_groups if len(active_groups) else None
+
+
+def get_active_group_accounts(group):
+    """
+    Получить список аккаунтов, привязанных к активной группе.
+    
+    Args:
+        group (str): Название или идентификатор группы.
+    
+    Returns:
+        list: Список аккаунтов, привязанных к указанной группе.
+    """
+    settings = load_settings()
+    groups = settings.get("groups", {})
+    
+    if group in groups:
+        return groups[group]
+    
+    return []
+
+
 
 def set_active_group(group):
     settings = load_settings()
