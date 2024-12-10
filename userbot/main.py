@@ -9,6 +9,8 @@ from telethon.tl.types import ReactionEmoji
 
 from utils.settings import load_settings, save_settings
 from utils.proxy import get_proxy, delete_proxy
+from utils.groups import get_active_group, list_groups
+
 from utils.console import console
 from utils.config import load_config
 
@@ -105,9 +107,14 @@ async def start_client(session_path, api_id, api_hash, settings):
         console.log(f'Аккаунт {session_path[9:]} разлогинен.')
         await client.disconnect()
         return None
+        
+    active_group = get_active_group()
+    if active_group:
+        resolved_groups = await resolve_groups(client, active_group)
+    else:
+        groups = list_groups()
+        resolved_groups = await resolve_groups(client, groups)
 
-    groups = settings.get("groups", [])
-    resolved_groups = await resolve_groups(client, groups)
     reactions = settings["reactions"]
     emojis = reactions["emojis"]
     random_emojis = reactions.get("random_emojis", True)
