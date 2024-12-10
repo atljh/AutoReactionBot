@@ -64,7 +64,7 @@ async def list_admin_message(message: types.Message):
             )
         ])
     message_text = "\n".join(admins_list)
-    await message.edit_text(
+    await message.answer(
         message_text, reply_markup=keyboard, parse_mode="HTML"
     )
 

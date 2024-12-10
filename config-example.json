@@ -3,6 +3,6 @@
     "api_id": 1111,
     "api_hash": "",
 
-    "admins": [123]
+    "admins": [123, "username"]
 }
   

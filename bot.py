@@ -26,7 +26,7 @@ async def main():
         default=DefaultBotProperties(parse_mode=ParseMode.HTML)
     )
     try:
-        console.log("[green]Бот запущен[/green]")
+        console.log("Бот запущен", style="green")
         await dp.start_polling(bot)
     except Exception as e:
         console.log(f"Ошибка: {e}", style="bold red")
