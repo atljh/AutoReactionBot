@@ -110,8 +110,6 @@ def get_active_group_accounts(group):
     
     return []
 
-
-
 def set_active_group(group):
     settings = load_settings()
     active_groups = settings.get("active_groups", [])
@@ -126,3 +124,10 @@ def delete_active_group(group):
         save_settings(settings)
         return True
     return False
+
+def link_default_to_group(group, sessions):
+    for sess in sessions:
+        account = sess[9:].split('.')[0]
+        result = get_account_groups(account)
+        if not result:
+            link_account_to_group(group, account)

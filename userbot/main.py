@@ -9,7 +9,7 @@ from telethon.tl.types import ReactionEmoji
 
 from utils.settings import load_settings, save_settings
 from utils.proxy import get_proxy, delete_proxy
-from utils.groups import get_active_groups, get_account_groups, get_active_group_accounts
+from utils.groups import get_active_groups, get_account_groups, get_active_group_accounts, link_default_to_group
 
 from utils.console import console
 from utils.config import load_config
@@ -173,7 +173,6 @@ async def start_client(session_path, api_id, api_hash, groups):
         except Exception as e:
             console.log(f"Ошибка при получении участника: {e}")
             return
-
         reaction = choice(emojis) if random_emojis else emojis[0]
         try:
             await client(SendReactionRequest(
@@ -227,7 +226,9 @@ async def main():
     active_groups = get_active_groups()
     for act_gr in active_groups:
         active_accounts = get_active_group_accounts(act_gr)
-        print(active_accounts)
+        if not len(active_accounts):
+            link_default_to_group(act_gr, session_files)
+
     clients = []
     for session_file in session_files:
         account_phone = session_file[9:].split('.')[0]
