@@ -3,7 +3,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from utils.settings import load_settings, save_settings
 from services.account_manager import list_sessions
-from utils.groups import link_account_to_group
+from utils.groups import link_account_to_group, unlink_account_from_group
 
 async def link_account_handler(callback_query: types.CallbackQuery):
     group = callback_query.data.split('_')[-1]
@@ -77,20 +77,16 @@ async def confirm_link_handler(callback_query: types.CallbackQuery):
         )
     )
 
-
 async def unlink_account_handler(callback_query: types.CallbackQuery):
     data = callback_query.data.split('_')
     group = data[-2]
     account = data[-1]
 
-    settings = load_settings()
-
-    if group in settings.get("groups", {}) and account in settings["groups"][group]:
-        settings["groups"][group].remove(account)
-        save_settings(settings)
+    if unlink_account_from_group(account, group):
         await callback_query.answer(f"Аккаунт {account} отвязан от группы {group}.")
     else:
         await callback_query.answer(f"Ошибка: Аккаунт {account} не найден в группе {group}.")
+        return
 
     await link_account_handler(
         types.CallbackQuery(

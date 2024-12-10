@@ -53,3 +53,11 @@ def link_account_to_group(group, account):
     except Exception as e:
         print(f"Ошибка: {e}")
         return False
+
+def unlink_account_from_group(account, group):
+    settings = load_settings()
+    if group in settings.get("groups", {}) and account in settings["groups"][group]:
+        settings["groups"][group].remove(account)
+        save_settings(settings)
+        return True
+    return False
