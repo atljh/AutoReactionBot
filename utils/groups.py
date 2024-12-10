@@ -28,6 +28,20 @@ def list_groups():
     return settings.get("groups", {})
 
 
+def get_account_groups(account):
+    """
+    Возвращает список групп, к которым привязан указанный аккаунт.
+
+    :param account: Номер телефона аккаунта (например, "+38093531234").
+    :return: Список ссылок на группы.
+    """
+    settings = load_settings()
+    groups = settings.get("groups", {})
+    
+    account_groups = [group for group, accounts in groups.items() if account in accounts]
+    return account_groups
+
+
 def link_account_to_group(group, account):
     try:
         with open("settings.json", "r") as file:
@@ -62,18 +76,29 @@ def unlink_account_from_group(account, group):
         return True
     return False
 
+def is_group_active(group):
+    settings = load_settings()
+    active_groups = settings.get("active_groups", [])
+    if group in active_groups:
+        return True
+    return False
 
 def get_active_group():
     settings = load_settings()
-    active_group = settings.get("active_group", "")
-    return active_group if active_group else None
+    active_groups = settings.get("active_groups", [])
+    return active_groups if len(active_groups) else None
 
 def set_active_group(group):
     settings = load_settings()
-    settings["active_group"] = group
+    active_groups = settings.get("active_groups", [])
+    active_groups.append(group)
     save_settings(settings)
 
-def delete_active_group():
+def delete_active_group(group):
     settings = load_settings()
-    settings["active_group"] = None
-    save_settings(settings)
+    active_groups = settings["active_groups"]
+    if group in active_groups:
+        active_groups.remove(group)
+        save_settings(settings)
+        return True
+    return False

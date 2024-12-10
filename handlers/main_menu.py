@@ -3,6 +3,7 @@ from aiogram.filters import Command
 
 import utils.keyboards as keyboards
 from utils.admin import user_is_admin
+from handlers.userbot import is_userbot_process_running
 
 router = Router()
 
@@ -13,9 +14,17 @@ async def main_menu(callback_query: types.CallbackQuery):
         username=callback_query.from_user.username
     )):
         return
+    userbot_running = is_userbot_process_running()
+    status_emoji = "🟢" if userbot_running else "🔴"
+    status_text = "активен" if userbot_running else "не активен"
+
     await callback_query.message.edit_text(
-        "Привет! Я бот для управления аккаунтами и реакциями. Выберите действие:",
-        reply_markup=keyboards.main_menu
+        f"👋 *Привет!*\n\n"
+        f"Я бот для управления аккаунтами и реакциями.\n\n"
+        f"🖥️ *Статус софта:* {status_emoji} {status_text}\n\n"
+        f"📋 *Выберите действие:*",
+        reply_markup=keyboards.main_menu,
+        parse_mode="Markdown"
     )
 
 
@@ -25,9 +34,16 @@ async def cmd_start(message: types.Message):
         await message.answer("У вас нет прав для использования этого бота.")
         return
 
-    await message.answer(
-        "Привет! Я бот для управления аккаунтами и реакциями. Выберите действие:",
-        reply_markup=keyboards.main_menu
-    )
+    userbot_running = is_userbot_process_running()
+    status_emoji = "🟢" if userbot_running else "🔴"
+    status_text = "активен" if userbot_running else "не активен"
 
+    await message.answer(
+        f"👋 *Привет!*\n\n"
+        f"Я бот для управления аккаунтами и реакциями.\n\n"
+        f"🖥️ *Статус софта:* {status_emoji} {status_text}\n\n"
+        f"📋 *Выберите действие:*",
+        reply_markup=keyboards.main_menu,
+        parse_mode="Markdown"
+    )
 
