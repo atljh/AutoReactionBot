@@ -8,6 +8,7 @@ from telethon.errors.rpcerrorlist import ChatAdminRequiredError, UserNotParticip
 from telethon.tl.types import ReactionEmoji
 
 from utils.settings import load_settings, save_settings
+from utils.proxy import get_proxy, delete_proxy
 from utils.console import console
 from utils.config import load_config
 
@@ -88,9 +89,18 @@ async def start_client(session_path, api_id, api_hash, settings):
     """
     Запуск клиента и настройка событий.
     """
-    client = TelegramClient(session_path, api_id, api_hash)
+    proxy = get_proxy()
+    if proxy:
+        try:
+            client = TelegramClient(session_path, api_id, api_hash, proxy=proxy[0])
+            await client.connect()
+        except TypeError:
+            console.log("Неправильный формат прокси")
+            delete_proxy(proxy)
+    else:
+        client = TelegramClient(session_path, api_id, api_hash)
+        await client.connect()
 
-    await client.connect()
     if not (await client.is_user_authorized()):
         console.log(f'Аккаунт {session_path[9:]} разлогинен.')
         await client.disconnect()
