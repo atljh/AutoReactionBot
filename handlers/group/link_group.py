@@ -15,7 +15,6 @@ async def link_account_handler(callback_query: types.CallbackQuery):
     
     keyboard = InlineKeyboardMarkup(inline_keyboard=[])
 
-    # Отображение привязанных аккаунтов
     if linked_accounts:
         message += "🔗 Привязанные аккаунты:\n"
         for account in linked_accounts:
@@ -48,7 +47,6 @@ async def link_account_handler(callback_query: types.CallbackQuery):
         ]
     )
 
-    # Обновление сообщения с новой информацией
     await callback_query.message.edit_text(
         message,
         reply_markup=keyboard,
@@ -59,27 +57,26 @@ async def confirm_link_handler(callback_query: types.CallbackQuery):
     _, _, group, account = callback_query.data.split('_')
     success = link_account_to_group(group, account)
 
-    # Создаем клавиатуру с кнопками
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [
-            InlineKeyboardButton(text="⬅️ Назад", callback_data="view_groups")
-        ]
-    ])
-
-    # Сообщение после привязки
     if success:
         await callback_query.answer(
-            f"✅ Аккаунт <b>{account}</b> успешно привязан к группе <b>{group}</b>.",
-            parse_mode="HTML"
+            f"✅ Аккаунт {account} успешно привязан к группе {group}.",
         )
     else:
         await callback_query.answer(
-            f"❌ Не удалось привязать аккаунт <b>{account}</b> к группе <b>{group}</b>.",
-            parse_mode="HTML"
+            f"❌ Не удалось привязать аккаунт {account} к группе {group}.",
         )
-    
-    # После привязки возвращаем актуальную информацию о группе
-    await link_account_handler(callback_query)
+        return
+
+    await link_account_handler(
+        types.CallbackQuery(
+            id=callback_query.id,
+            from_user=callback_query.from_user,
+            message=callback_query.message,
+            chat_instance="mock_chat_instance",
+            data=f"link_account_{group}"
+        )
+    )
+
 
 async def unlink_account_handler(callback_query: types.CallbackQuery):
     data = callback_query.data.split('_')
@@ -88,13 +85,19 @@ async def unlink_account_handler(callback_query: types.CallbackQuery):
 
     settings = load_settings()
 
-    # Удаление аккаунта из группы
     if group in settings.get("groups", {}) and account in settings["groups"][group]:
         settings["groups"][group].remove(account)
         save_settings(settings)
-        await callback_query.answer(f"Аккаунт {account} отвязан от группы {group}.", show_alert=True)
+        await callback_query.answer(f"Аккаунт {account} отвязан от группы {group}.")
     else:
-        await callback_query.answer(f"Ошибка: Аккаунт {account} не найден в группе {group}.", show_alert=True)
+        await callback_query.answer(f"Ошибка: Аккаунт {account} не найден в группе {group}.")
 
-    # После отвязки возвращаем актуальную информацию о группе
-    await link_account_handler(callback_query)
+    await link_account_handler(
+        types.CallbackQuery(
+            id=callback_query.id,
+            from_user=callback_query.from_user,
+            message=callback_query.message,
+            chat_instance="mock_chat_instance",
+            data=f"link_account_{group}"
+        )
+    )
