@@ -61,3 +61,19 @@ def unlink_account_from_group(account, group):
         save_settings(settings)
         return True
     return False
+
+
+def get_active_group():
+    settings = load_settings()
+    active_group = settings.get("active_group", "")
+    return active_group if active_group else None
+
+def set_active_group(group):
+    settings = load_settings()
+    settings["active_group"] = group
+    save_settings(settings)
+
+def delete_active_group():
+    settings = load_settings()
+    settings["active_group"] = None
+    save_settings(settings)

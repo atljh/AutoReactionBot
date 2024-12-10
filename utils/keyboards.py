@@ -113,6 +113,7 @@ add_group_button = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton(text="➕ Добавить группу", callback_data="add_group"),
+            InlineKeyboardButton(text="Выбрать активную группу", callback_data="select_group"),
             InlineKeyboardButton(text="⬅️ Назад", callback_data="main_menu")
         ]
     ]

@@ -34,6 +34,7 @@ async def view_groups_handler(callback_query: types.CallbackQuery):
     keyboard.inline_keyboard.append(
         [
             InlineKeyboardButton(text="➕ Добавить группу", callback_data="add_group"),
+            InlineKeyboardButton(text="Выбрать активную группу", callback_data="select_group"),
             InlineKeyboardButton(text="⬅️ Назад", callback_data="settings")
         ]
     )
