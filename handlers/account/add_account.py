@@ -40,14 +40,14 @@ async def process_phone_number(message: types.Message, state: FSMContext):
         result = await client.send_code_request(phone)
 
         await state.update_data(phone=phone, client=client)
-        await message.edit_text(
+        await message.answer(
             "Введите пришедший код уведомления добавив пробел после любой цифры\nНапример: 81 35",
             reply_markup=cancel_button,
         )
         await state.set_state(AddAccountStates.waiting_for_code)
 
     except Exception as e:
-        await message.edit_text(f"Произошла ошибка: {str(e)}", reply_markup=cancel_button)
+        await message.answer(f"Произошла ошибка: {str(e)}", reply_markup=cancel_button)
         await state.clear()
 
 

@@ -1,6 +1,7 @@
 import os
 import asyncio
 from random import choice, randint
+from socks import SOCKS5
 
 from telethon import TelegramClient, events
 from telethon.tl.functions.messages import SendReactionRequest
@@ -87,29 +88,39 @@ async def react_to_last_messages(client, chat_id, settings, active):
         console.log(f"Ошибка при обработке сообщений группы {chat_id}: {e}")
 
 
+def parse_proxy(proxy_string):
+    """
+    Parses a proxy string in the format:
+    socks5:host:port:username:password
+    """
+    parts = proxy_string.strip().split(':')
+    if len(parts) == 5 and parts[0] == "socks5":
+        return (SOCKS5, parts[1], int(parts[2]), True, parts[3], parts[4])
+    else:
+        raise ValueError("Неправильный формат прокси")
+
 async def start_client(session_path, api_id, api_hash, groups):
-    """
-    Запуск клиента и настройка событий.
-    """
+
     proxy = get_proxy()
     if proxy:
         try:
-            client = TelegramClient(session_path, api_id, api_hash, proxy=proxy[0])
+            proxy_config = parse_proxy(proxy[0])
+            print("Proxy parsed successfully:", proxy_config)
+
+            client = TelegramClient(session_path, api_id, api_hash, proxy=proxy_config)
             await client.connect()
+            print("Successfully connected to Telegram with proxy")
+                    
+        except ValueError as e:
+            print("Ошибка парсинга прокси:", e)
         except TypeError:
-            console.log("Неправильный формат прокси")
-            delete_proxy(proxy)
+            print("Ошибка подключения: Неправильный формат прокси")
     else:
         client = TelegramClient(session_path, api_id, api_hash)
         await client.connect()
-
-    if not (await client.is_user_authorized()):
-        console.log(f'Аккаунт {session_path[9:]} разлогинен.')
-        await client.disconnect()
-        return None
-
+        print("Successfully connected to Telegram")
+    
     resolved_groups = await resolve_groups(client, groups)
-
     settings = load_settings()
     reactions = settings["reactions"]
     emojis = reactions["emojis"]
