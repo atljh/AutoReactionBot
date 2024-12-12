@@ -100,7 +100,6 @@ def parse_proxy(proxy_string):
         raise ValueError("Неправильный формат прокси")
 
 async def start_client(session_path, api_id, api_hash, groups):
-
     proxy = get_proxy()
     if proxy:
         try:
@@ -123,7 +122,7 @@ async def start_client(session_path, api_id, api_hash, groups):
     resolved_groups = await resolve_groups(client, groups)
     settings = load_settings()
     reactions = settings["reactions"]
-    emojis = reactions["emojis"]
+
     random_emojis = reactions.get("random_emojis", True)
     send_delay = reactions.get("send_delay", 10)
     ignore_messages_range = reactions.get("ignore_messages", [1, 3])
@@ -136,9 +135,6 @@ async def start_client(session_path, api_id, api_hash, groups):
     active = True
 
     async def work_cycle():
-        """
-        Циклическое управление активностью клиента.
-        """
         nonlocal active
         while True:
             console.log(f"Активная фаза {active_time // 60} минут.")
@@ -154,14 +150,17 @@ async def start_client(session_path, api_id, api_hash, groups):
     if last_messages_count > 0:
         for group_id in resolved_groups:
             await react_to_last_messages(client, group_id, settings, active)
-            
+    
+    messages_count = 0
+
     @client.on(events.NewMessage(chats=resolved_groups))
     async def handler(event):
-        """
-        Обработчик новых сообщений в группах.
-        """
+        nonlocal messages_count
         if not event.is_group or not active:
             return
+        
+        messages_count += 1 
+        print(messages_count)
 
         if event.id % randint(*ignore_messages_range) == 0:
             console.log(f"Сообщение {event.id} проигнорировано (в диапазоне ignore_messages).")
@@ -170,7 +169,11 @@ async def start_client(session_path, api_id, api_hash, groups):
         settings = load_settings()
         reactions = settings["reactions"]
         admin_bypass = reactions.get("admin_bypass", False)
-
+        emojis = reactions.get("emojis", [])
+        if not emojis:
+            console.log("Нет эмодзи в списке", style="red")
+            return
+        
         try:
             sender = await event.get_sender()            
             permissions = await client.get_permissions(event.chat_id, sender)
@@ -210,9 +213,6 @@ async def start_client(session_path, api_id, api_hash, groups):
 
 
 async def main():
-    """
-    Основной цикл запуска сессий.
-    """
     if not config.get("api_hash") or not config.get("api_id"):
         console.log("api_id и api_hash должны быть указаны в переменных окружения.")
         return

@@ -1,20 +1,13 @@
-import psutil
 import subprocess
 
 from aiogram import Router, F, types
+
+from handlers.main_menu import main_menu
 
 router = Router()
 
 telethon_process = None
 
-def is_userbot_process_running():
-    for process in psutil.process_iter(['pid', 'name', 'cmdline']):
-        try:
-            if process.info['cmdline'] and "python" in process.info['name'] and "-m" in process.info['cmdline'] and "userbot.main" in process.info['cmdline']:
-                return True
-        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-            pass
-    return False
 
 @router.callback_query(F.data == 'start_software')
 async def handle_start_software(callback_query: types.CallbackQuery):
@@ -29,6 +22,7 @@ async def handle_start_software(callback_query: types.CallbackQuery):
         try:
             telethon_process = subprocess.Popen(["python","-m", "userbot.main"])
             await callback_query.message.answer("Telethon-бот успешно запущен!")
+            await main_menu(callback_query)
         except Exception as e:
             await callback_query.message.answer(f"Ошибка при запуске d-бота: {e}")
     else:
@@ -48,6 +42,7 @@ async def handle_stop_software(callback_query: types.CallbackQuery):
             telethon_process.terminate()
             telethon_process = None
             await callback_query.message.answer("Telethon-бот успешно остановлен.")
+            await main_menu(callback_query)
         except Exception as e:
             await callback_query.message.answer(f"Ошибка при остановке Telethon-бота: {e}")
     else:

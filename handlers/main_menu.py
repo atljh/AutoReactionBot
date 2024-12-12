@@ -1,11 +1,21 @@
+import psutil
+
 from aiogram import Router, types, F
 from aiogram.filters import Command
 
 import utils.keyboards as keyboards
 from utils.admin import user_is_admin
-from handlers.userbot import is_userbot_process_running
 
 router = Router()
+
+def is_userbot_process_running():
+    for process in psutil.process_iter(['pid', 'name', 'cmdline']):
+        try:
+            if process.info['cmdline'] and "python" in process.info['name'] and "-m" in process.info['cmdline'] and "userbot.main" in process.info['cmdline']:
+                return True
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+    return False
 
 @router.callback_query(F.data == 'main_menu')
 async def main_menu(callback_query: types.CallbackQuery):

@@ -2,7 +2,7 @@ from aiogram import types, F
 
 from utils import keyboards
 from utils.settings import load_settings
-from handlers.userbot import is_userbot_process_running
+from handlers.main_menu import is_userbot_process_running
 
 
 async def settings_handler(callback_query: types.CallbackQuery):
