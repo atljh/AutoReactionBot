@@ -1,11 +1,12 @@
 import os
 import asyncio
-from random import choice, randint
 from socks import SOCKS5
+from random import choice, randint
 
 from telethon import TelegramClient, events
 from telethon.tl.functions.messages import SendReactionRequest
 from telethon.errors.rpcerrorlist import ChatAdminRequiredError, UserNotParticipantError
+from telethon.tl.functions.channels import GetFullChannelRequest
 from telethon.tl.types import ReactionEmoji
 
 from utils.settings import load_settings, save_settings
@@ -22,21 +23,26 @@ os.makedirs(SESSION_FOLDER, exist_ok=True)
 
 
 async def resolve_groups(client, groups):
-    """
-    Преобразование ссылок групп в ID, если это необходимо.
-    """
+
     resolved_ids = []
     for group in groups:
-        if isinstance(group, int):
-            resolved_ids.append(group)
-        elif isinstance(group, str):
-            try:
+        try:
+            if group.isdigit() or (group.startswith("-") and group[1:].isdigit()):
+                group_id = int(group)
+                if not str(group_id).startswith("-100"):
+                    raise ValueError(f"Invalid group ID format: {group_id}")
+                entity = await client(GetFullChannelRequest(channel=group_id))
+                print(entity.full_chat)  
+                resolved_ids.append(entity.full_chat.id)
+
+            elif isinstance(group, str):
                 entity = await client.get_entity(group)
                 resolved_ids.append(entity.id)
-            except Exception as e:
-                console.log(f"Ошибка при обработке группы {group}: {e}")
+        
+        except Exception as e:
+            print(f"Error processing group '{group}': {e}")
+    
     return resolved_ids
-
 
 async def react_to_last_messages(client, chat_id, settings, active):
     """
@@ -104,7 +110,6 @@ async def start_client(session_path, api_id, api_hash, groups):
     if proxy:
         try:
             proxy_config = parse_proxy(proxy[0])
-            print("Proxy parsed successfully:", proxy_config)
 
             client = TelegramClient(session_path, api_id, api_hash, proxy=proxy_config)
             await client.connect()
@@ -120,6 +125,7 @@ async def start_client(session_path, api_id, api_hash, groups):
         print("Successfully connected to Telegram")
     
     resolved_groups = await resolve_groups(client, groups)
+    
     settings = load_settings()
     reactions = settings["reactions"]
 
@@ -186,7 +192,7 @@ async def start_client(session_path, api_id, api_hash, groups):
             console.log(f"Пользователь не является участником группы.")
         except Exception as e:
             console.log(f"Ошибка при получении участника: {e}")
-            return
+
         reaction = choice(emojis) if random_emojis else emojis[0]
         try:
             await client(SendReactionRequest(
@@ -253,6 +259,9 @@ async def main():
         if not client:
             continue
         clients.append(client)
+    
+    if not clients:
+        return
 
     try:
         await asyncio.gather(*[client.run_until_disconnected() for client in clients])
