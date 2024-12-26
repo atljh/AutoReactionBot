@@ -8,6 +8,7 @@ SETTINGS_FILE = "settings.json"
 def load_settings():
     if not os.path.exists(SETTINGS_FILE):
         print(f"Файл {SETTINGS_FILE} не найден.")
+        create_default_settings()
         return None
 
     with open(SETTINGS_FILE, "r") as file:
@@ -49,19 +50,23 @@ def update_setting(key, value):
 def create_default_settings():
     default_settings = {
         "reactions": {
-            "emojis": ["👍", "❤️", "😂", "🔥"],
+            "emojis": ["👍", "😁", "🥰"],
+            "send_delay": 5,
             "random_emojis": True,
-            "ingore_messages": [1, 3],
+            "ingore_messages": [1, 5],
             "work_intervals": {
-                "active_minutes": 10,
-                "pause_minutes": 20
+                "active_minutes": 12,
+                "pause_minutes": 30
             },
-            "admin_bypass": True
+            "admin_bypass": True,
+            "last_messages_count": 10
         },
-        "system": {
-            "restart_command": "sudo systemctl restart bot",
-            "log_level": "WARNING"
-        }
+        "groups": {
+        },
+        "proxy": [
+        ],
+        "active_groups": [
+        ]
     }
     save_settings(default_settings)
 
